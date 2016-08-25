@@ -45,7 +45,23 @@ class AvailRoomFinder(object):
 
         return rooms
 
-    def search(self, min_size=1, print_to_stdout=False):
+    def search_free(self, prefix, min_size=1, print_to_stdout=False):
+        selected_rooms = {}
+        for email in self.rooms:
+            name, size = self.rooms[email]
+            if name.startswith(prefix) and size > min_size:
+                selected_rooms[email] = (name, size)
+
+        selected_room_info = self.search(selected_rooms, print_to_stdout)
+        free_room_info = {}
+        for email in selected_room_info:
+            if selected_room_info[email]['status'] == 'Free':
+                free_room_info[email] = selected_room_info[email]
+        return free_room_info
+
+    def search(self, selected_rooms=None, print_to_stdout=False):
+        if selected_rooms is None:
+            selected_rooms = self.rooms()
         room_info = {}
 
         if print_to_stdout:
@@ -55,7 +71,7 @@ class AvailRoomFinder(object):
         xml_template = open("getavailibility_template.xml", "r").read()
         xml = Template(xml_template)
 
-        for email in self.rooms:
+        for email in selected_rooms:
             data = unicode(xml.substitute(email=email,
                                           starttime=self.start_time + TIME_ZONE,
                                           endtime=self.end_time + TIME_ZONE))
@@ -67,6 +83,8 @@ class AvailRoomFinder(object):
                        + "-u "+ self.user + ":" + self.password \
                        + " " + URL
             response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+            if not response:
+                return room_info
 
             tree = ET.fromstring(response)
 
@@ -82,9 +100,7 @@ class AvailRoomFinder(object):
                     status = "Tentative"
 
             name, size = self.rooms[email]
-
-            if status == 'Free' and size > min_size:
-                room_info[name] = {'size': size, 'freebusy': freebusy}
+            room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status}
 
             if print_to_stdout:
                 print "{0:20s} {1:64s} {2:64s}".format(status + '-' + freebusy, self.rooms[email], email)
@@ -94,6 +110,9 @@ class AvailRoomFinder(object):
 def run():
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
+    parser.add_argument("-prefix", "--prefix",
+                        help="A prefix to search for. e.g. 'SJC19- SJC18-'",
+                        default='')
     parser.add_argument("-start", "--starttime",
                         help="Starttime e.g. 2014-07-02T11:00:00 (default = now)",
                         default=TIME_NOW)
@@ -108,7 +127,7 @@ def run():
     args.password = getpass.getpass("Password:")
 
     room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.endtime, args.file)
-    print room_finder.search(print_to_stdout=True)
+    print room_finder.search_free(prefix=args.prefix, print_to_stdout=True)
 
 
 if __name__ == '__main__':
