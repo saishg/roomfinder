@@ -28,8 +28,12 @@ function init(){
     createCombo(durationMinSelect, duration_mins);
     buildingSelect.value = "SJC19";
     floorSelect.value="3";
-    startTimeHourSelect.value = "09";
     durationMinSelect.value = "30m";
+
+    var date = new Date();
+    var today = date.toISOString().split('T')[0];
+    document.getElementById("bookDate").setAttribute('value', today);
+    document.getElementById("startTimeHourSelect").value = date.getHours();
 }
 
 function createCombo(container, data) {
@@ -60,7 +64,7 @@ function submitClickHandler() {
     mytable.visiblity = false;
 
     var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
-    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${confereneceRoomDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
+    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
     loadRooms(queryString);
 
 }
@@ -72,9 +76,9 @@ function loadRooms(queryString) {
 
     xmlHttp.open("GET", url, false); // false for synchronous request
     xmlHttp.send(null);
-    if (xmlHttp.responseText != "") {
-        avaiable_rooms = JSON.parse(xmlHttp.responseText);
-        showFreeRooms(avaiable_rooms);
+    if (xmlHttp.responseText.trim() != "") {
+        available_rooms = JSON.parse(xmlHttp.responseText);
+        showFreeRooms(available_rooms);
     }
 }
 
