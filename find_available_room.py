@@ -7,6 +7,7 @@ import datetime
 import getpass
 import subprocess
 import sys
+import threading
 import xml.etree.ElementTree as ET
 
 from string import Template
@@ -28,6 +29,7 @@ class AvailRoomFinder(object):
         self.user = user
         self.password = password
         self.start_time = start_time
+        self.room_info = {}
 
         try:
             if 'h' in duration and duration.endswith('m'):
@@ -72,10 +74,35 @@ class AvailRoomFinder(object):
                 free_room_info[email] = selected_room_info[email]
         return free_room_info
 
+    def _query(self, command, email, print_to_stdout=False):
+        response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+        if not response:
+            return
+
+        tree = ET.fromstring(response)
+
+        status = "Free"
+        elems = tree.findall(SCHEME_TYPES + "MergedFreeBusy")
+        freebusy = ''
+        for elem in elems:
+            freebusy = elem.text
+            if '2' in freebusy:
+                status = "Busy"
+            elif '3' in freebusy:
+                status = "Unavailable"
+            elif '1' in freebusy:
+                status = "Tentative"
+
+        name, size = self.rooms[email]
+        self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status}
+
+        if print_to_stdout:
+            print "{0:20s} {1:64s} {2:64s}".format(status + '-' + freebusy, self.rooms[email], email)
+
     def search(self, selected_rooms=None, print_to_stdout=False):
         if selected_rooms is None:
             selected_rooms = self.rooms
-        room_info = {}
+        worker_threads = []
 
         if print_to_stdout:
             print "Searching for a room from " + self.start_time + " to " + self.end_time + ":"
@@ -95,31 +122,15 @@ class AvailRoomFinder(object):
                        + "' --ntlm " \
                        + "-u "+ self.user + ":" + self.password \
                        + " " + URL
-            response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
-            if not response:
-                return room_info
 
-            tree = ET.fromstring(response)
+            thread = threading.Thread(target=self._query, args=(command, email, print_to_stdout))
+            thread.start()
+            worker_threads.append(thread)
 
-            status = "Free"
-            elems = tree.findall(SCHEME_TYPES + "MergedFreeBusy")
-            freebusy = ''
-            for elem in elems:
-                freebusy = elem.text
-                if '2' in freebusy:
-                    status = "Busy"
-                elif '3' in freebusy:
-                    status = "Unavailable"
-                elif '1' in freebusy:
-                    status = "Tentative"
+        for thread in worker_threads:
+            thread.join()
 
-            name, size = self.rooms[email]
-            room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status}
-
-            if print_to_stdout:
-                print "{0:20s} {1:64s} {2:64s}".format(status + '-' + freebusy, self.rooms[email], email)
-
-        return room_info
+        return self.room_info
 
 def run():
     parser = argparse.ArgumentParser()
