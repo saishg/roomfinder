@@ -19,47 +19,66 @@ TIME_1H_FROM_NOW = None
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-def read_room_list(filename='rooms.csv'):
-    rooms = {}
+class AvailRoomFinder(object):
 
-    with open(filename, 'r') as fhandle:
-        reader = csv.reader(fhandle)
-        for row in reader:
-            rooms[unicode(row[1])] = unicode(row[0])
+    def __init__(self, user, password,
+                 start_time=TIME_NOW, end_time=None,
+                 roominfo='rooms.csv'):
+        self.rooms = self._read_room_list(roominfo)
+        self.user = user
+        self.password = password
+        self.start_time = start_time
+        if end_time is None:
+            start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
+            self.end_time = (start + datetime.timedelta(hours=1)).isoformat()
 
-    return rooms
+    def _read_room_list(self, filename):
+        rooms = {}
 
+        with open(filename, 'r') as fhandle:
+            reader = csv.reader(fhandle)
+            for row in reader:
+                rooms[unicode(row[1])] = (unicode(row[0]), int(row[2]))
 
-def find_available_rooms(rooms, user, password, start_time=TIME_NOW, end_time=None):
-    if end_time is None:
-        start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
-        end_time = (start + datetime.timedelta(hours=1)).isoformat()
+        return rooms
 
-    print "Searching for a room from " + start_time + " to " + end_time + ":"
-    print "{0:10s} {1:64s} {2:64s}".format("Status", "Room", "Email")
+    def search(self, min_size=1, print_to_stdout=False):
+        room_info = {}
 
-    xml_template = open("getavailibility_template.xml", "r").read()
-    xml = Template(xml_template)
-    for room in rooms:
-        data = unicode(xml.substitute(email=room, starttime=start_time, endtime=end_time))
+        if print_to_stdout:
+            print "Searching for a room from " + self.start_time + " to " + self.end_time + ":"
+            print "{0:10s} {1:64s} {2:64s}".format("Status", "Room", "Email")
 
-        header = "\"content-type: text/xml;charset=utf-8\""
-        command = "curl --silent --header " + header \
-                   + " --data '" + data \
-                   + "' --ntlm " \
-                   + "-u "+ user + ":" + password \
-                   + " " + URL
-        response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+        xml_template = open("getavailibility_template.xml", "r").read()
+        xml = Template(xml_template)
 
-        tree = ET.fromstring(response)
+        for email in self.rooms:
+            data = unicode(xml.substitute(email=email, starttime=self.start_time, endtime=self.end_time))
 
-        status = "Free"
-        # arrgh, namespaces!!
-        elems = tree.findall(SCHEME_TYPES + "BusyType")
-        for elem in elems:
-            status = elem.text
+            header = "\"content-type: text/xml;charset=utf-8\""
+            command = "curl --silent --header " + header \
+                       + " --data '" + data \
+                       + "' --ntlm " \
+                       + "-u "+ self.user + ":" + self.password \
+                       + " " + URL
+            response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
 
-        print "{0:10s} {1:64s} {2:64s}".format(status, rooms[room], room)
+            tree = ET.fromstring(response)
+
+            status = "Free"
+            elems = tree.findall(SCHEME_TYPES + "BusyType")
+            for elem in elems:
+                status = elem.text
+
+            name, size = self.rooms[email]
+
+            if status == 'Free' and size > min_size:
+                room_info[name] = {'size': size}
+
+            if print_to_stdout:
+                print "{0:10s} {1:64s} {2:64s}".format(status, self.rooms[email], email)
+
+        return room_info
 
 def run():
     parser = argparse.ArgumentParser()
@@ -77,8 +96,8 @@ def run():
     args = parser.parse_args()
     args.password = getpass.getpass("Password:")
 
-    rooms = read_room_list()
-    find_available_rooms(rooms, args.user, args.password, args.starttime, args.endtime)
+    room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.endtime)
+    print room_finder.search(print_to_stdout=True)
 
 
 if __name__ == '__main__':
