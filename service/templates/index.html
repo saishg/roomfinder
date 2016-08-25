@@ -17,10 +17,12 @@
 
     <br/><br/>
     <div>
-        <label id="buildingLabel">Building</label>
+        <label id="buildingLabel">Building:</label>
         <select id="buildingSelect"></select>
-        <label id="floorLabel">Floor</label>
+        <label id="floorLabel">Floor:</label>
         <select id="floorSelect"></select>
+        <label id="roomSizeLabel">Attendees:</label>
+        <select id="roomSizeSelect"></select>
     </div>
 <br/>
     <div>
@@ -37,11 +39,10 @@
 
 
 <br/><br/>
+<button id="submitButton" onclick="submitClickHandler()">Search for free rooms</button>
 
 <br/>
 <br/>
-<button id="submitButton" onclick="submitClickHandler()"> SUBMIT </button>
-
 <table id="mytable">
 </table>
 
