@@ -94,7 +94,7 @@ class AvailRoomFinder(object):
                 status = "Tentative"
 
         name, size = self.rooms[email]
-        self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status}
+        self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status, 'email' : email}
 
         if print_to_stdout:
             print "{0:20s} {1:64s} {2:64s}".format(status + '-' + freebusy, self.rooms[email], email)
