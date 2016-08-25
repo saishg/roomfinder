@@ -84,9 +84,8 @@ function loadRooms(queryString) {
 
 
 function showFreeRooms(rooms_json) {
-    var tbl = document.getElementById('mytable');
     for (var key in rooms_json) {
-        tbl.innerHTML += "<td><link>" + key + "</link></td>";
+        mytable.innerHTML += "<td><link>" + key + "</link></td>";
     }
     mytable.visiblity = true;
 }
