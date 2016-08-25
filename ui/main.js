@@ -28,6 +28,7 @@ var date_days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
                  "31"];
 
 
+
 function init(){
 
     createCombo(buildingSelect, buildings);
@@ -40,7 +41,6 @@ function init(){
     createCombo(dateYearSelect, date_years);
     createCombo(dateMonthSelect, date_months);
     createCombo(dateDaySelect, date_days);
-
 }
 
 function createCombo(container, data) {
@@ -61,8 +61,8 @@ function loadRooms(postData) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
-            //document.getElementById("demo").innerHTML = xhttp.responseText;
-            console.log(xhttp.responseText)
+            showFreeRooms(xhttp.responseText);
+            console.log(xhttp.responseText);
         }
     };
     xhttp.open("POST", "http://www.w3schools.com/ajax/demo_post2.asp", true);
@@ -70,6 +70,12 @@ function loadRooms(postData) {
     xhttp.send(postData);
 }
 
+function showFreeRooms(rooms_json) {
+    var tbl = document.getElementById('mytable');
+    for (var key in rooms_json) {
+        tbl.innerHTML += "<tr><td>" + key + "</td></tr>";
+    }
+}
 
 
 
