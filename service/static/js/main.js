@@ -26,7 +26,6 @@ function init(){
     createCombo(startTimeMinSelect, times_mins);
     createCombo(durationHourSelect, duration_hours);
     createCombo(durationMinSelect, duration_mins);
-    createCombo(roomSizeSelect, sizes);
     createCombo(dateYearSelect, date_years);
     createCombo(dateMonthSelect, date_months);
     createCombo(dateDaySelect, date_days);
@@ -50,6 +49,7 @@ function loadBuildingNamesList() {
 http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
 	
 function submitClickHandler() {
+	document.getElementById('mytable').innerHTML = "";
     var queryString = `\?user=${userNameInput.value}\&password=${passwordInput.value}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${dateYearSelect.value}-${dateMonthSelect.value}-${dateDaySelect.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
     loadRooms(queryString);
     //console.log(queryString);
@@ -63,19 +63,16 @@ function loadRooms(queryString) {
     xmlHttp.open( "GET", url, false ); // false for synchronous request
     xmlHttp.send( null );
     avaibale_rooms = JSON.parse(xmlHttp.responseText);
-    console.log(avaibale_rooms);
-//    var xhttp = new XMLHttpRequest();
-//    xhttp.onreadystatechange = function() {
-//        if (xhttp.readyState == 4 && xhttp.status == 200) {
-//            //document.getElementById("demo").innerHTML = xhttp.responseText;
-//            console.log(xhttp.responseText)
-//        }
-//    };
-//    xhttp.open("POST", "http://www.w3schools.com/ajax/demo_post2.asp", true);
-//    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-//    xhttp.send(postData);
+    showFreeRooms(avaibale_rooms);
+    
 }
 
 
+function showFreeRooms(rooms_json) {
+    var tbl = document.getElementById('mytable');
+    for (var key in rooms_json) {
+        tbl.innerHTML += "<tr><td>" + key + "</td></tr>";
+    }
+}
 
 
