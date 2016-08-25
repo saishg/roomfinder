@@ -19,7 +19,8 @@ CONFIG = {
         'roomscsv' : PWD + '/rooms.csv',
         'roomssearchcsv' : PWD + '/roomssearch.csv',  
         'availibility_template' : PWD + '/getavailibility_template.xml', 
-        'URL': "https://mail.cisco.com/ews/exchange.asmx"
+        'URL': "https://mail.cisco.com/ews/exchange.asmx",
+        'allrooms' :  PWD + '/allrooms.csv',
         }
 
 app = Flask(__name__)
@@ -32,6 +33,17 @@ def index():
 from flask import request
 
 QueryParam = namedtuple('QueryParam', 'roomname, starttime, duration, user, password')
+
+@app.route('/showbuldings', methods=['GET'])
+def show_buldings():
+    buldings = []
+    with open(CONFIG['allrooms'],'r') as f:
+        for line in f.readlines():
+            buldingname = line.split('-')[0]
+            if buldingname not in buldings:
+                buldings.append(buldingname)
+    return json.dumps(buldings)
+
 
 # Example Query 
 # http://127.0.0.1:5000/showrooms?roomname=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password
