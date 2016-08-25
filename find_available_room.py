@@ -48,7 +48,7 @@ class AvailRoomFinder(object):
 
         if print_to_stdout:
             print "Searching for a room from " + self.start_time + " to " + self.end_time + ":"
-            print "{0:10s} {1:64s} {2:64s}".format("Status", "Room", "Email")
+            print "{0:20s} {1:64s} {2:64s}".format("Status", "Room", "Email")
 
         xml_template = open("getavailibility_template.xml", "r").read()
         xml = Template(xml_template)
@@ -69,17 +69,23 @@ class AvailRoomFinder(object):
             tree = ET.fromstring(response)
 
             status = "Free"
-            elems = tree.findall(SCHEME_TYPES + "BusyType")
+            elems = tree.findall(SCHEME_TYPES + "MergedFreeBusy")
             for elem in elems:
-                status = elem.text
+                freebusy = elem.text
+                if '2' in freebusy:
+                    status = "Busy"
+                elif '3' in freebusy:
+                    status = "Unavailable"
+                elif '1' in freebusy:
+                    status = "Tentative"
 
             name, size = self.rooms[email]
 
             if status == 'Free' and size > min_size:
-                room_info[name] = {'size': size}
+                room_info[name] = {'size': size, 'freebusy': freebusy}
 
             if print_to_stdout:
-                print "{0:10s} {1:64s} {2:64s}".format(status, self.rooms[email], email)
+                print "{0:20s} {1:64s} {2:64s}".format(status + '-' + freebusy, self.rooms[email], email)
 
         return room_info
 
