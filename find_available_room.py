@@ -32,6 +32,8 @@ class AvailRoomFinder(object):
         if end_time is None:
             start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
             self.end_time = (start + datetime.timedelta(hours=1)).isoformat()
+        else:
+            self.end_time = end_time
 
     def _read_room_list(self, filename):
         rooms = {}
