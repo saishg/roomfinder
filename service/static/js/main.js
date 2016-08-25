@@ -26,9 +26,13 @@ function init(){
     createCombo(startTimeMinSelect, times_mins);
     createCombo(durationHourSelect, duration_hours);
     createCombo(durationMinSelect, duration_mins);
-    createCombo(dateYearSelect, date_years);
-    createCombo(dateMonthSelect, date_months);
-    createCombo(dateDaySelect, date_days);
+    //createCombo(dateYearSelect, date_years);
+    //createCombo(dateMonthSelect, date_months);
+    //createCombo(dateDaySelect, date_days);
+    buildingSelect.value = "SJC19";
+    floorSelect.value="3";
+    startTimeHourSelect.value = "09";
+    durationMinSelect.value = "30m";
 }
 
 function createCombo(container, data) {
@@ -49,10 +53,19 @@ function loadBuildingNamesList() {
 http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
 	
 function submitClickHandler() {
-	document.getElementById('mytable').innerHTML = "";
-    var queryString = `\?user=${userNameInput.value}\&password=${passwordInput.value}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${dateYearSelect.value}-${dateMonthSelect.value}-${dateDaySelect.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
-    loadRooms(queryString);
+	
+	var tableHeaderRowCount = 1;
+	var rowCount = mytable.rows.length;
+	for (var i = tableHeaderRowCount; i < rowCount; i++) {
+		mytable.deleteRow(tableHeaderRowCount);
+		console.log("clearing row number:"+i);
+	}
+	mytable.innerHTML = "";
+	mytable.visiblity = false;
+	var queryString = `\?user=${userNameInput.value}\&password=${passwordInput.value}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${confereneceRoomDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
     //console.log(queryString);
+    loadRooms(queryString);
+   
 }
 
 function loadRooms(queryString) {
@@ -71,8 +84,9 @@ function loadRooms(queryString) {
 function showFreeRooms(rooms_json) {
     var tbl = document.getElementById('mytable');
     for (var key in rooms_json) {
-        tbl.innerHTML += "<tr><td>" + key + "</td></tr>";
+        tbl.innerHTML += "<td><link>" + key + "</link></td>";
     }
+    mytable.visiblity = true;
 }
 
 
