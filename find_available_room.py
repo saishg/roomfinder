@@ -14,7 +14,6 @@ from string import Template
 URL = 'https://mail.cisco.com/ews/exchange.asmx'
 SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
-TIME_1H_FROM_NOW = None
 TIME_ZONE = '-13:00' #PST HACK
 
 reload(sys)
@@ -23,17 +22,29 @@ sys.setdefaultencoding("utf-8")
 class AvailRoomFinder(object):
 
     def __init__(self, user, password,
-                 start_time=TIME_NOW, end_time=None,
+                 start_time=TIME_NOW, duration='1h',
                  roominfo='rooms.csv'):
         self.rooms = self._read_room_list(roominfo)
         self.user = user
         self.password = password
         self.start_time = start_time
-        if end_time is None:
-            start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
-            self.end_time = (start + datetime.timedelta(hours=1)).isoformat()
-        else:
-            self.end_time = end_time
+
+        try:
+            if duration.endswith('h'):
+                hours, mins = int(duration[:-1]), 0
+            elif duration.endswith('m'):
+                hours, mins = 0, int(duration[:-1])
+            else:
+                duration = int(duration)
+                if duration < 15:
+                    hours, mins = duration, 0
+                else:
+                    hours, mins = 0, duration
+        except ValueError:
+            self.duration = (1, 0)
+
+        start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
+        self.end_time = (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
 
     def _read_room_list(self, filename):
         rooms = {}
@@ -61,7 +72,7 @@ class AvailRoomFinder(object):
 
     def search(self, selected_rooms=None, print_to_stdout=False):
         if selected_rooms is None:
-            selected_rooms = self.rooms()
+            selected_rooms = self.rooms
         room_info = {}
 
         if print_to_stdout:
@@ -116,9 +127,9 @@ def run():
     parser.add_argument("-start", "--starttime",
                         help="Starttime e.g. 2014-07-02T11:00:00 (default = now)",
                         default=TIME_NOW)
-    parser.add_argument("-end", "--endtime",
-                        help="Endtime e.g. 2014-07-02T12:00:00 (default = now+1h)",
-                        default=TIME_1H_FROM_NOW)
+    parser.add_argument("-duration", "--duration",
+                        help="Duration e.g. 1h or 15m (default = 1h)",
+                        default='1h')
     parser.add_argument("-f", "--file",
                         help="csv filename with room info (default=rooms.csv).",
                         default="rooms.csv")
@@ -126,7 +137,7 @@ def run():
     args = parser.parse_args()
     args.password = getpass.getpass("Password:")
 
-    room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.endtime, args.file)
+    room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.duration, args.file)
     print room_finder.search_free(prefix=args.prefix, print_to_stdout=True)
 
 
