@@ -4,18 +4,18 @@
   <soap:Body>
     <GetUserAvailabilityRequest xmlns="http://schemas.microsoft.com/exchange/services/2006/messages">
       <TimeZone xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
-        <Bias>-60</Bias>
+        <Bias>-420</Bias>
         <StandardTime>
-          <Bias>0</Bias>
-          <Time>03:00:00</Time>
-          <DayOrder>5</DayOrder>
-          <Month>10</Month>
+          <Bias>-360</Bias>
+          <Time>02:00:00</Time>
+          <DayOrder>6</DayOrder>
+          <Month>11</Month>
           <DayOfWeek>Sunday</DayOfWeek>
         </StandardTime>
         <DaylightTime>
-          <Bias>-60</Bias>
+          <Bias>-420</Bias>
           <Time>02:00:00</Time>
-          <DayOrder>5</DayOrder>
+          <DayOrder>13</DayOrder>
           <Month>3</Month>
           <DayOfWeek>Sunday</DayOfWeek>
         </DaylightTime>

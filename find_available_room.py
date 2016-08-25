@@ -14,7 +14,7 @@ from string import Template
 URL = 'https://mail.cisco.com/ews/exchange.asmx'
 SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
-TIME_ZONE = '-13:00' #PST HACK
+TIME_ZONE = ''
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
