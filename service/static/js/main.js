@@ -22,6 +22,7 @@ function init(){
     loadBuildingNamesList();
     createCombo(buildingSelect, buildings);
     createCombo(floorSelect, floors);
+    createCombo(roomSizeSelect, sizes);
     createCombo(startTimeHourSelect, times_hours);
     createCombo(startTimeMinSelect, times_mins);
     createCombo(durationHourSelect, duration_hours);
@@ -64,7 +65,7 @@ function submitClickHandler() {
     mytable.visiblity = false;
 
     var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
-    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
+    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}&attendees=${roomSizeSelect.value}`;
     loadRooms(queryString);
 
 }
