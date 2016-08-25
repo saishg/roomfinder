@@ -31,23 +31,23 @@ def index():
 
 from flask import request
 
-QueryParam = namedtuple('QueryParam', 'roomname, starttime, endtime, user, password')
+QueryParam = namedtuple('QueryParam', 'roomname, starttime, duration, user, password')
 
 # Example Query 
-# http://127.0.0.1:5000/showrooms?roomname=ABC&starttime=2016-08-25T09:00:00-13:00&endtime=2016-08-25T10:00:00-13:00&user=USER&password=password
+# http://127.0.0.1:5000/showrooms?roomname=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password
 @app.route('/showrooms', methods=['GET'])
 def show_rooms():
     queryparam = QueryParam(
                             roomname=request.args.get('roomname'),
                             starttime=request.args.get('starttime'),
-                            endtime=request.args.get('endtime'),
+                            duration=request.args.get('duration'),
                             user = request.args.get('user'),
                             password = request.args.get('password'),
                             )
 
     _create_tmp_rooms_file(queryparam.roomname)
     
-    room_finder = AvailRoomFinder(queryparam.user, queryparam.password, queryparam.starttime, queryparam.endtime, CONFIG['roomssearchcsv'])
+    room_finder = AvailRoomFinder(queryparam.user, queryparam.password, queryparam.starttime, queryparam.duration, CONFIG['roomssearchcsv'])
     rooms_info = room_finder.search_free(prefix=queryparam.roomname, print_to_stdout=True)
 
     return json.dumps(rooms_info)
