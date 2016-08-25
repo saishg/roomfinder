@@ -50,8 +50,10 @@ class RoomFinder(object):
         for elem in elems:
             email = elem.findall(SCHEME_TYPES + "EmailAddress")
             name = elem.findall(SCHEME_TYPES + "DisplayName")
-            if len(email) > 0 and len(name) > 0:
-                tmp_rooms[email[0].text] = name[0].text
+            if len(email) and len(name):
+                roomsize = self.room_size(name[0].text)
+                if roomsize:
+                    tmp_rooms[email[0].text] = (name[0].text, roomsize)
         return tmp_rooms
 
     def search(self, prefix, deep=False):
@@ -66,15 +68,22 @@ class RoomFinder(object):
         print "Search for prefix '" + prefix + "' yielded " + str(len(rooms_found)) + " rooms."
         self.rooms.update(self._search(prefix))
 
-    def dump(self, filename):
+    def room_size(self, roomname):
+        try:
+            return int(roomname[roomname.find('(') + 1 : roomname.find(')')])
+        except ValueError:
+            return 0
+
+    def dump(self, filename='rooms.csv'):
         if not len(self.rooms):
             print "Check your arguments for mistakes"
             return 0
 
         with open(filename, "wb") as fhandle:
             writer = csv.writer(fhandle)
-            for email, name in sorted(self.rooms.iteritems(), key=operator.itemgetter(1)):
-                writer.writerow([name, email])
+            for email, room_info in sorted(self.rooms.iteritems(), key=operator.itemgetter(1)):
+                name, size = room_info
+                writer.writerow([name, email, size])
 
         return len(self.rooms)
 
@@ -90,10 +99,9 @@ def run():
     finder = RoomFinder(args.user, args.password)
 
     for prefix in args.prefix:
-        print prefix, args.deep
         finder.search(prefix, args.deep)
 
-    if finder.dump("rooms.csv"):
+    if finder.dump():
         exit(0)
     else:
         exit(1)
