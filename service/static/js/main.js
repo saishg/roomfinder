@@ -26,13 +26,14 @@ function init(){
     createCombo(startTimeMinSelect, times_mins);
     createCombo(durationHourSelect, duration_hours);
     createCombo(durationMinSelect, duration_mins);
-    //createCombo(dateYearSelect, date_years);
-    //createCombo(dateMonthSelect, date_months);
-    //createCombo(dateDaySelect, date_days);
     buildingSelect.value = "SJC19";
     floorSelect.value="3";
-    startTimeHourSelect.value = "09";
     durationMinSelect.value = "30m";
+
+    var date = new Date();
+    var today = date.toISOString().split('T')[0];
+    document.getElementById("bookDate").setAttribute('value', today);
+    document.getElementById("startTimeHourSelect").value = date.getHours();
 }
 
 function createCombo(container, data) {
@@ -47,37 +48,38 @@ function loadBuildingNamesList() {
     xmlHttp.open( "GET", "http://localhost:5000/showbuldings", false ); // false for synchronous request
     xmlHttp.send( null );
     buildings = JSON.parse(xmlHttp.responseText);
-    console.log(buildings);
+    //console.log(buildings);
 }
 
-http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
-	
+//Example: http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
+
 function submitClickHandler() {
-	
-	var tableHeaderRowCount = 1;
-	var rowCount = mytable.rows.length;
-	for (var i = tableHeaderRowCount; i < rowCount; i++) {
-		mytable.deleteRow(tableHeaderRowCount);
-		console.log("clearing row number:"+i);
-	}
-	mytable.innerHTML = "";
-	mytable.visiblity = false;
-	var queryString = `\?user=${userNameInput.value}\&password=${passwordInput.value}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${confereneceRoomDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
-    //console.log(queryString);
+    var tableHeaderRowCount = 1;
+    var rowCount = mytable.rows.length;
+    for (var i = tableHeaderRowCount; i < rowCount; i++) {
+        mytable.deleteRow(tableHeaderRowCount);
+        console.log("clearing row number:"+i);
+    }
+    mytable.innerHTML = "";
+    mytable.visiblity = false;
+
+    var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
+    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
     loadRooms(queryString);
-   
+
 }
 
 function loadRooms(queryString) {
     var xmlHttp = new XMLHttpRequest();
     url = "http://localhost:5000/showrooms";
     url = url.concat(queryString);
-    	
-    xmlHttp.open( "GET", url, false ); // false for synchronous request
-    xmlHttp.send( null );
-    avaibale_rooms = JSON.parse(xmlHttp.responseText);
-    showFreeRooms(avaibale_rooms);
-    
+
+    xmlHttp.open("GET", url, false); // false for synchronous request
+    xmlHttp.send(null);
+    if (xmlHttp.responseText.trim() != "") {
+        available_rooms = JSON.parse(xmlHttp.responseText);
+        showFreeRooms(available_rooms);
+    }
 }
 
 

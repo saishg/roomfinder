@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import base64
 import csv
 import datetime
 import getpass
 import subprocess
 import sys
 import threading
+import urllib
 import xml.etree.ElementTree as ET
 
 from string import Template
@@ -120,7 +122,7 @@ class AvailRoomFinder(object):
             command = "curl --silent --header " + header \
                        + " --data '" + data \
                        + "' --ntlm " \
-                       + "-u "+ self.user + ":" + self.password \
+                       + "-u "+ self.user + ":" + base64.b64decode(urllib.unquote(self.password)) \
                        + " " + URL
 
             thread = threading.Thread(target=self._query, args=(command, email, print_to_stdout))
@@ -149,7 +151,7 @@ def run():
                         default="rooms.csv")
 
     args = parser.parse_args()
-    args.password = getpass.getpass("Password:")
+    args.password = base64.b64encode(getpass.getpass("Password:"))
 
     room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.duration, args.file)
     print room_finder.search_free(prefix=args.prefix, print_to_stdout=True)
