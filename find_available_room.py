@@ -30,7 +30,9 @@ class AvailRoomFinder(object):
         self.start_time = start_time
 
         try:
-            if duration.endswith('h'):
+            if 'h' in duration and duration.endswith('m'):
+                hours, mins = map(int, duration[:-1].split('h'))
+            elif duration.endswith('h'):
                 hours, mins = int(duration[:-1]), 0
             elif duration.endswith('m'):
                 hours, mins = 0, int(duration[:-1])
@@ -41,7 +43,7 @@ class AvailRoomFinder(object):
                 else:
                     hours, mins = 0, duration
         except ValueError:
-            self.duration = (1, 0)
+            hours, mins = 1, 0
 
         start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
         self.end_time = (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
@@ -101,6 +103,7 @@ class AvailRoomFinder(object):
 
             status = "Free"
             elems = tree.findall(SCHEME_TYPES + "MergedFreeBusy")
+            freebusy = ''
             for elem in elems:
                 freebusy = elem.text
                 if '2' in freebusy:
