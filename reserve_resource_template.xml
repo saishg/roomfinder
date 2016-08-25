@@ -1,32 +1,39 @@
-<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-               xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages"       
-               xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types"       
-               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-   <soap:Body>
-      <m:CreateItem SendMeetingInvitations="SendToAllAndSaveCopy">
-         <m:Items>
-            <t:CalendarItem>
-               <t:Subject>$subject</t:Subject>
-               <t:Body BodyType="Text">$subject</t:Body>
-               <t:Start>$starttime</t:Start>
-               <t:End>$endtime</t:End>
-               <t:Location>Conf Room</t:Location>
-               <t:RequiredAttendees>
-                  <t:Attendee>
-                     <t:Mailbox>
-                        <t:EmailAddress>$resourceemail</t:EmailAddress>
-                     </t:Mailbox>
-                  </t:Attendee>
-               </t:RequiredAttendees>
-               <t:OptionalAttendees>
-                  <t:Attendee>
-                     <t:Mailbox>
-                        <t:EmailAddress>$useremail</t:EmailAddress>
-                     </t:Mailbox>
-                  </t:Attendee>
-               </t:OptionalAttendees>
-            </t:CalendarItem>
-         </m:Items>
-      </m:CreateItem>
-   </soap:Body>
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" 
+       xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2007_SP1" />
+    <t:TimeZoneContext>
+      <t:TimeZoneDefinition Id="Pacific Standard Time" />
+    </t:TimeZoneContext>
+  </soap:Header>
+  <soap:Body>
+    <m:CreateItem SendMeetingInvitations="SendToAllAndSaveCopy">
+      <m:Items>
+        <t:CalendarItem>
+          <t:Subject>$subject</t:Subject>
+          <t:Body BodyType="HTML">$meeting_body</t:Body>
+          <t:ReminderMinutesBeforeStart>15</t:ReminderMinutesBeforeStart>
+          <t:Start>$starttime</t:Start>
+          <t:End>$endtime</t:End>
+          <t:Location>$conf_room</t:Location>
+          <t:RequiredAttendees>
+            <t:Attendee>
+              <t:Mailbox>
+                <t:EmailAddress>$resourceemail</t:EmailAddress>
+              </t:Mailbox>
+            </t:Attendee>
+          </t:RequiredAttendees>
+          <t:OptionalAttendees>
+            <t:Attendee>
+              <t:Mailbox>
+                <t:EmailAddress>$useremail</t:EmailAddress>
+              </t:Mailbox>
+            </t:Attendee>
+          </t:OptionalAttendees>
+          <t:MeetingTimeZone TimeZoneName="Pacific Standard Time" />
+        </t:CalendarItem>
+      </m:Items>
+    </m:CreateItem>
+  </soap:Body>
 </soap:Envelope>
