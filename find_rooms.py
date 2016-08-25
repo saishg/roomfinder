@@ -74,7 +74,7 @@ class RoomFinder(object):
         except ValueError:
             return 0
 
-    def dump(self, filename):
+    def dump(self, filename='rooms.csv'):
         if not len(self.rooms):
             print "Check your arguments for mistakes"
             return 0
@@ -101,7 +101,7 @@ def run():
     for prefix in args.prefix:
         finder.search(prefix, args.deep)
 
-    if finder.dump("rooms.csv"):
+    if finder.dump():
         exit(0)
     else:
         exit(1)
