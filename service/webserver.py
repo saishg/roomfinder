@@ -48,7 +48,7 @@ def show_rooms():
     _create_tmp_rooms_file(queryparam.roomname)
     
     room_finder = AvailRoomFinder(queryparam.user, queryparam.password, queryparam.starttime, queryparam.endtime, CONFIG['roomssearchcsv'])
-    rooms_info = room_finder.search(print_to_stdout=True)
+    rooms_info = room_finder.search_free(prefix=queryparam.roomname, print_to_stdout=True)
 
     return json.dumps(rooms_info)
 
