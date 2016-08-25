@@ -10,6 +10,7 @@ from collections import namedtuple
 from flask import Flask
 from shutil import copyfile
 from string import Template
+from find_available_room import AvailRoomFinder
 
 PWD = os.getcwd()
 
@@ -46,35 +47,10 @@ def show_rooms():
 
     _create_tmp_rooms_file(queryparam.roomname)
     
-    rooms = {}
-    for row in csv.reader(open(CONFIG['roomssearchcsv'], 'r')):
-        rooms[row[1]]=(row[0])
+    room_finder = AvailRoomFinder(queryparam.user, queryparam.password, queryparam.starttime, queryparam.endtime, CONFIG['roomssearchcsv'])
+    rooms_info = room_finder.search(print_to_stdout=True)
 
-    xml_template = open(CONFIG['availibility_template'], "r").read()
-    xml = Template(xml_template)
-    resp = []
-    
-    for room in rooms:
-        data = unicode(xml.substitute(email=room,
-                                      starttime=queryparam.starttime,
-                                      endtime=queryparam.endtime))
-        header = "\"content-type: text/xml;charset=utf-8\""
-        command = "curl --silent --header " + header +" --data '" + data + "' --ntlm "\
-                + "-u "+ queryparam.user+":"+queryparam.password+" "+ CONFIG['URL']
-        response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
-        tree = ET.fromstring(response)
-        status = "Free"
-        elems = tree.findall(".//{http://schemas.microsoft.com/exchange/services/2006/types}BusyType")
-        for elem in elems:
-            status = elem.text
-        subject = ""
-        elems = tree.findall(".//{http://schemas.microsoft.com/exchange/services/2006/types}Subject")
-        for elem in elems:
-            subject += elem.text
-        
-        resp.append({'status':status, 'room' : rooms[room], 'roomid' : room, 'subject' : subject})         
-        
-    return json.dumps(resp)
+    return json.dumps(rooms_info)
 
 def _create_tmp_rooms_file(roomname):
     if 'all' in roomname:
