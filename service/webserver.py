@@ -59,9 +59,14 @@ def show_rooms():
 
     prefix = queryparam.buildingname + '-' + queryparam.floor
     _create_tmp_rooms_file(prefix)
-    
-    room_finder = AvailRoomFinder(queryparam.user, queryparam.password, queryparam.starttime, queryparam.duration, CONFIG['roomssearchcsv'])
-    rooms_info = room_finder.search_free(prefix, print_to_stdout=True)
+   
+    try: 
+        room_finder = AvailRoomFinder(queryparam.user, queryparam.password,
+                                      queryparam.starttime, queryparam.duration,
+                                      CONFIG['roomssearchcsv'])
+        rooms_info = room_finder.search_free(prefix, print_to_stdout=True)
+    except Exception as e:
+        rooms_info = {"Error:" + str(e) : ""}
     print queryparam
     print prefix
     print rooms_info
