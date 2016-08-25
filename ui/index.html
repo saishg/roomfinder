@@ -4,33 +4,45 @@
     <script type="text/javascript" src="main.js"></script>
 </head>
 <body onload="init()">
-<span span style="color:Red">Select Building, Floor & Time </span>
-<br/><br/>
+<font face="Verdana">
+<br/>
+<br/>
+
+<center>
 <div id="optionContainer">
     <div>
-        <label id="buildingLabel">Select Building</label>
+        <span>User Name: </span> <input type="text" id="userNameInput"></input>
+        <span>Password: </span> <input type="password" id="passwordInput"></input>
+    </div>
+
+    <br/><br/>
+    <div>
+        <label id="buildingLabel">Building</label>
         <select id="buildingSelect"></select>
-        <label id="floorLabel">Select Floor</label>
+        <label id="floorLabel">Floor</label>
         <select id="floorSelect"></select>
+        <label id="roomSizeLabel">Attendees</label>
+        <select id="roomSizeSelect"></select>
     </div>
 <br/>
     <div>
         <label id="startTimeLabel">Start Time: </label>
-        <select id="startTimeSelect"></select>
-        <label id="endTimeLabel">End Time:     </label>
-        <select id="endTimeSelect"></select>
+        <select id="startTimeHourSelect"></select>
+        <select id="startTimeMinSelect"></select>
+        <label id="durationLabel">Duration:     </label>
+        <select id="durationHourSelect"></select>
+        <select id="durationMinSelect"></select>
     </div>
 </div>
 
 
 <br/><br/>
-<div>
-    <span>User Name: </span> <input type="text" id="userNameInput"></input>
-    <span>Password: </span> <input type="password" id="passwordInput"></input>
-</div>
+
+<br/>
 <br/>
 <button id="submitButton" onclick="submitClickHandler()"> SUBMIT </button>
 
+</center>
+</font>
 </body>
-
 </html>
