@@ -20,6 +20,12 @@ var duration_hours = ["0h", "1h", "2h","3h",
                       "4h", "5h", "6h", "7h"];
 var duration_mins = ["", "15m", "30m","45m"];
 var sizes = ["1", "2", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "23", "24", "25", "30", "36", "50", "60", "65", "68", "70", "100", "120", "410"]
+var date_years = ["2016", "2017"];
+var date_months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+var date_days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
+                 "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+                 "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
+                 "31"];
 
 
 function init(){
@@ -31,6 +37,9 @@ function init(){
     createCombo(durationHourSelect, duration_hours);
     createCombo(durationMinSelect, duration_mins);
     createCombo(roomSizeSelect, sizes);
+    createCombo(dateYearSelect, date_years);
+    createCombo(dateMonthSelect, date_months);
+    createCombo(dateDaySelect, date_days);
 
 }
 
