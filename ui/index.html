@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="main.js"></script>
+</head>
+<body onload="init()">
+<span span style="color:Red">Select Building, Floor & Time </span>
+<br/><br/>
+<div id="optionContainer">
+    <div>
+        <label id="buildingLabel">Select Building</label>
+        <select id="buildingSelect"></select>
+        <label id="floorLabel">Select Floor</label>
+        <select id="floorSelect"></select>
+    </div>
+<br/>
+    <div>
+        <label id="startTimeLabel">Start Time: </label>
+        <select id="startTimeSelect"></select>
+        <label id="endTimeLabel">End Time:     </label>
+        <select id="endTimeSelect"></select>
+    </div>
+</div>
+
+
+<br/><br/>
+<div>
+    <span>User Name: </span> <input type="text" id="userNameInput"></input>
+    <span>Password: </span> <input type="password" id="passwordInput"></input>
+</div>
+<br/>
+<button id="submitButton" onclick="submitClickHandler()"> SUBMIT </button>
+
+</body>
+
+</html>
