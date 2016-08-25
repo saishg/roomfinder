@@ -1,88 +1,102 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
-from string import Template
-from string import letters
-from string import digits
-import subprocess
 import getpass
 import xml.etree.ElementTree as ET
 import argparse
 import csv
 import operator
+import subprocess
+import sys
+
+from string import Template
+from string import letters
+from string import digits
 
 URL = 'https://mail.cisco.com/ews/exchange.asmx'
+SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 
-def find_room_with_prefix(prefix, xml, user, password):
-	rooms={}
-	data = unicode(xml.substitute(name=prefix))
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
-	header = '"content-type: text/xml;charset=utf-8"'
-	command = "curl --silent --header " + header + " --data '" + data + "' --ntlm " + "-u "+ user + ":" + password + " " + URL
-	response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+class RoomFinder(object):
 
-	if not response.strip():
-		# something went wrong
-		return rooms
+    def __init__(self, user, password):
+        self.user = user
+        self.password = password
+        xml_template = open("resolvenames_template.xml", "r").read()
+        self.xml = Template(xml_template)
+        self.rooms = {}
 
-	tree = ET.fromstring(response)
+    def _search(self, prefix):
+        tmp_rooms = {}
+        data = unicode(self.xml.substitute(name=prefix))
 
-	elems=tree.findall(".//{http://schemas.microsoft.com/exchange/services/2006/types}Resolution")
-	for elem in elems:
-		email = elem.findall(".//{http://schemas.microsoft.com/exchange/services/2006/types}EmailAddress")
-		name = elem.findall(".//{http://schemas.microsoft.com/exchange/services/2006/types}DisplayName")
-		if len(email) > 0 and len(name) > 0:
-			rooms[email[0].text] = name[0].text
-	return rooms
+        header = '"content-type: text/xml;charset=utf-8"'
+        command = "curl --silent --header " + header \
+                   + " --data '" + data \
+                   + "' --ntlm " \
+                   +  "-u "+ self.user + ":" + self.password \
+                   + " " + URL
+        response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
 
-def parse_args():
-	parser = argparse.ArgumentParser()
-	parser.add_argument("prefix", nargs='+',help="A list of prefixes to search for. E.g. 'conference confi'")
-	parser.add_argument("-u","--user", help="user name for exchange/outlook", required=True)
-	parser.add_argument("-d","--deep", help="Attemp a deep search (takes longer).", action="store_true")
-	args=parser.parse_args()
+        if not response.strip():
+            # something went wrong
+            return tmp_rooms
 
-	password = getpass.getpass("Password:")
-	return args.user, password, args.prefix, args.deep
+        tree = ET.fromstring(response)
 
-def find_rooms():
-	user, password, prefixes, deep = parse_args()
-	query_suceeded = False
+        elems = tree.findall(SCHEME_TYPES + "Resolution")
+        for elem in elems:
+            email = elem.findall(SCHEME_TYPES + "EmailAddress")
+            name = elem.findall(SCHEME_TYPES + "DisplayName")
+            if len(email) > 0 and len(name) > 0:
+                tmp_rooms[email[0].text] = name[0].text
+        return tmp_rooms
 
-	xml_template = open("resolvenames_template.xml", "r").read()
-	xml = Template(xml_template)
+    def search(self, prefix, deep=False):
+        rooms_found = self._search(prefix)
 
-	rooms={}
+        if deep:
+            symbols = letters + digits
+            for symbol in symbols:
+                prefix_deep = prefix + " " + symbol
+                rooms_found.update(self._search(prefix_deep))
 
-	for prefix in prefixes:
-		rooms.update(find_room_with_prefix(prefix, xml, user, password))
-		print "Search for prefix '" + prefix + "' yielded " + str(len(rooms)) + " rooms."
-		if len(rooms):
-			query_suceeded = True
-		else:
-			print "Check your arguments for mistakes"
-			return 1
+        print "Search for prefix '" + prefix + "' yielded " + str(len(rooms_found)) + " rooms."
+        self.rooms.update(self._search(prefix))
 
-		if deep: 
-			symbols = letters + digits
-			for symbol in symbols:
-				prefix_deep = prefix + " " + symbol
-				rooms.update(find_room_with_prefix(prefix_deep, xml, user, password))
-				query_suceeded = True
+    def dump(self, filename):
+        if not len(self.rooms):
+            print "Check your arguments for mistakes"
+            return 0
 
-			print "Deep search for prefix '" + prefix + "' yielded " + str(len(rooms)) + " rooms."
+        with open(filename, "wb") as fhandle:
+            writer = csv.writer(fhandle)
+            for email, name in sorted(self.rooms.iteritems(), key=operator.itemgetter(1)):
+                writer.writerow([name, email])
 
-	writer = csv.writer(open("rooms.csv", "wb"))
-	for item in sorted(rooms.iteritems(), key=operator.itemgetter(1)):
-		writer.writerow([item[1],item[0]])
-	return query_suceeded
+        return len(self.rooms)
+
+def run():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("prefix", nargs='+', help="A prefix to search for. e.g. 'SJC19- SJC18-'")
+    parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
+    parser.add_argument("-d", "--deep", help="Attemp a deep slow search", action="store_true")
+    args = parser.parse_args()
+
+    args.password = getpass.getpass("Password:")
+
+    finder = RoomFinder(args.user, args.password)
+
+    for prefix in args.prefix:
+        print prefix, args.deep
+        finder.search(prefix, args.deep)
+
+    if finder.dump("rooms.csv"):
+        exit(0)
+    else:
+        exit(1)
 
 if __name__ == '__main__':
-	if find_rooms():
-		exit(0)
-	else:
-		exit(1)
+    run()
