@@ -15,6 +15,7 @@ URL = 'https://mail.cisco.com/ews/exchange.asmx'
 SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
 TIME_1H_FROM_NOW = None
+TIME_ZONE = '-13:00' #PST HACK
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -53,7 +54,9 @@ class AvailRoomFinder(object):
         xml = Template(xml_template)
 
         for email in self.rooms:
-            data = unicode(xml.substitute(email=email, starttime=self.start_time, endtime=self.end_time))
+            data = unicode(xml.substitute(email=email,
+                                          starttime=self.start_time + TIME_ZONE,
+                                          endtime=self.end_time + TIME_ZONE))
 
             header = "\"content-type: text/xml;charset=utf-8\""
             command = "curl --silent --header " + header \
