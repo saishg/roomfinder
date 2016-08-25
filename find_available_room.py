@@ -105,7 +105,7 @@ def run():
     args = parser.parse_args()
     args.password = getpass.getpass("Password:")
 
-    room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.endtime)
+    room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.endtime, args.file)
     print room_finder.search(print_to_stdout=True)
 
 
