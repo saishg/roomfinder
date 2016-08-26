@@ -32,7 +32,7 @@ class AvailRoomFinder(object):
         self.password = password
         self.start_time = start_time
         self.room_info = {}
-        self.timezone = timezone
+        self.timezone = timezone or SJ_TIME_ZONE
 
         try:
             if 'h' in duration and duration.endswith('m'):

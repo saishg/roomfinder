@@ -2,51 +2,115 @@
 
 <head>
     <script type="text/javascript" src="static/js/main.js"></script>
+    <style>
+        body {
+            background-color: #e6ecff;
+            color: #555555;
+            font-family: "Verdana","Calibri",Geneva,sans-serif;
+        }
+        #banner{
+            background-color: #AAAAAA;
+            color: white;
+            font-size: 60px;
+            padding: 10px;
+            border-left: 10px solid orange;
+            border-radius: 5px;
+            text-align: center;
+        }
+        label{
+            display: inline-block;
+            text-align: left;
+            margin-top: 15px;
+            margin-bottom: 3px;
+        }
+        input{
+            width: 130px;
+            height: 25px;
+        }
+        #userLabel{
+            width: 130px;
+        }
+        #passwordLabel{
+            width: 130px;
+            margin-left: 5px;
+        }
+        #passwordInput{
+            margin-left: 5px;
+        }
+        #buildingSelect{
+            margin-left: 3px;
+        }
+        #floorLabel{
+            margin-left: 25px;
+        }
+        #floorSelect{
+            margin-left: 3px;
+        }
+        #roomSizeLabel{
+            margin-left: 25px;
+        }
+        #roomSizeSelect{
+            margin-left: 3px;
+        }
+        #startTimeHourSelect{
+            margin-left: 3px;
+        }
+        #durationLabel{
+            margin-left: 25px;
+        }
+        #durationHourSelect{
+            margin-left: 3px;
+        }
+        #submitButton{
+            margin-top: 30px;
+            margin-left: 1px;
+            height: 30px;
+            font-family: "Verdana","Calibri",Geneva,sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        fieldset{
+            border: none;
+            width: 650px;
+            margin: 0px auto;
+        }
+        #mytable{
+            margin: auto;
+            margin-top: 30px;
+            width: 650px;
+        }
+        td{
+            padding: 5px;
+        }
+    </style>
 </head>
 <body onload="init()">
-<font face="Verdana">
-<br/>
-<br/>
-
-<center>
 <div id="optionContainer">
-    <div>
-        <span>User Name: </span> <input type="text" id="userNameInput"></input>
-        <span>Password: </span> <input type="password" id="passwordInput"></input>
+    <div id="banner">
+        Conference Room Finder
     </div>
-
-    <br/><br/>
     <div>
-        <label id="buildingLabel">Building:</label>
-        <select id="buildingSelect"></select>
-        <label id="floorLabel">Floor:</label>
-        <select id="floorSelect"></select>
-        <label id="roomSizeLabel">Attendees:</label>
-        <select id="roomSizeSelect"></select>
-    </div>
-<br/>
-    <div>
-        <label id="dateLabel">Date:</label>
-        <input type="date" id="bookDate"/>
-        <label id="startTimeLabel">Time:</label>
-        <select id="startTimeHourSelect"></select>
-        <select id="startTimeMinSelect"></select>
-        <label id="durationLabel">Duration:     </label>
-        <select id="durationHourSelect"></select>
-        <select id="durationMinSelect"></select>
+        <fieldset>
+            <label id="userLabel">CEC User ID</label> <label id="passwordLabel">Password</label><br/>
+            <input type="text" id="userNameInput"></input> <input type="password" id="passwordInput"></input><br/>
+        <label id="buildingLabel">Building</label> <select id="buildingSelect"></select>
+        <label id="floorLabel">Floor</label> <select id="floorSelect"></select>
+        <label id="roomSizeLabel">Attendees</label> <select id="roomSizeSelect"></select><br/>
+        <label id="dateLabel">Date</label><br/> <input type="date" id="bookDate"/><br/>
+        <label id="startTimeLabel">Time</label>
+            <select id="startTimeHourSelect"></select>
+            <select id="startTimeMinSelect"></select>
+        <label id="durationLabel">Duration</label>
+            <select id="durationHourSelect"></select>
+            <select id="durationMinSelect"></select><br/>
+        <button id="submitButton" onclick="submitClickHandler()">Search for free rooms</button>
+        </fieldset>
     </div>
 </div>
 
 
-<br/><br/>
-<button id="submitButton" onclick="submitClickHandler()">Search for free rooms</button>
-
-<br/>
-<br/>
 <table id="mytable">
 </table>
 
-</center>
-</font>
 </body>
 </html>

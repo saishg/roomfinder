@@ -1,17 +1,11 @@
-import codecs
 from collections import namedtuple
-import csv
-import datetime
 from find_available_room import AvailRoomFinder 
 from book_room import ReserveAvailRoom
-from flask import Flask
 import flask
 import json
 import os
+
 from shutil import copyfile
-from string import Template
-import subprocess
-import xml.etree.ElementTree as ET
 from flask import Flask, request
 
 PWD = os.getcwd()
@@ -32,7 +26,7 @@ def index():
     return flask.render_template('index.html')
 
 QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees, timezone' )
-BookRoomQueryParam  = namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password')
+BookRoomQueryParam  = namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password, timezone')
 
 @app.route('/showbuldings', methods=['GET'])
 def show_buldings():
@@ -72,7 +66,7 @@ def show_rooms():
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees),
                                              print_to_stdout=True)
     except Exception as e:
-        rooms_info = {"Error:" + str(e) : ""}
+        rooms_info = {"Error: " + str(e) : ""}
     return json.dumps(rooms_info)
 
 @app.route('/bookroom', methods=['GET'])
@@ -84,13 +78,15 @@ def book_room():
                             duration=request.args.get('duration'),
                             user = request.args.get('user'),
                             password = request.args.get('password'),
+                            timezone = request.args.get('timezone'),
                             )
     room_finder = ReserveAvailRoom(queryparam.roomname,
                                    queryparam.roomemail,
                                    queryparam.user,
                                    queryparam.password,
                                    queryparam.starttime, 
-                                   queryparam.duration)
+                                   duration=queryparam.duration,
+                                   timezone=queryparam.timezone)
     rooms_info = room_finder.reserve_room(print_to_stdout=True)
     
     if 'Success' in rooms_info:
