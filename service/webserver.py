@@ -31,7 +31,7 @@ app = Flask(__name__, template_folder=CONFIG['home'] + '/service/templates')
 def index():
     return flask.render_template('index.html')
 
-QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password attendees' )
+QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees' )
 BookRoomQueryParam  = namedtuple('QueryParam', 'roomid, starttime, duration, user, password')
 
 @app.route('/showbuldings', methods=['GET'])
