@@ -2,15 +2,12 @@
 # -*- coding: utf-8 -*-
 import argparse
 import base64
-import csv
 import datetime
 import getpass
 import os
 import subprocess
 import sys
 import urllib
-import time
-import xml.etree.ElementTree as ET
 
 from string import Template
 
@@ -35,11 +32,10 @@ CONFIG = {
 
 class ReserveAvailRoom(object):
 
-    def __init__(self, roomid, user, password,
+    def __init__(self, roomname, roomemail, user, password,
                  start_time=TIME_NOW,
-                 roominfo='rooms.csv',
                  duration='1h'):
-        self.roomid = roomid
+        self.roomemail = roomemail
         self.user = user
         self.password = base64.b64decode(urllib.unquote(password))
         self.start_time = start_time
@@ -65,14 +61,13 @@ class ReserveAvailRoom(object):
         self.end_time = (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
 
     def reserve_room(self, selected_room, print_to_stdout=False):
-        room_info = {}
-
         xml_template = open("reserve_resource_template.xml", "r").read()
         xml = Template(xml_template)
         
         useremail = self.user + '@cisco.com'
         meeting_body = 'Meeting booked via Room Finder App by {0}'.format(useremail)
-        data = unicode(xml.substitute(resourceemail=self.roomid,
+
+        data = unicode(xml.substitute(resourceemail=self.roomemail,
                                       useremail=useremail,
                                       subject="Room Finder Meeting",
                                       starttime=self.start_time,
@@ -88,9 +83,6 @@ class ReserveAvailRoom(object):
                        + "-u "+ self.user + ":" + self.password \
                        + " " + URL
         response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
-        
-        tree = ET.fromstring(response)
-
         return response
 
 def run():
