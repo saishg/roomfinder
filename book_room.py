@@ -16,6 +16,7 @@ URL = 'https://mail.cisco.com/ews/exchange.asmx'
 SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
 TIME_1H_FROM_NOW = None
+SJ_TIME_ZONE = "420"
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -34,12 +35,13 @@ class ReserveAvailRoom(object):
 
     def __init__(self, roomname, roomemail, user, password,
                  start_time=TIME_NOW,
-                 duration='1h'):
+                 duration='1h', timezone=SJ_TIME_ZONE):
         self.roomname = roomname
         self.roomemail = roomemail
         self.user = user
         self.password = base64.b64decode(urllib.unquote(password))
         self.start_time = start_time
+        self.timezone = timezone or SJ_TIME_ZONE
         
         try:
             if 'h' in duration and duration.endswith('m'):
@@ -76,6 +78,7 @@ class ReserveAvailRoom(object):
                                       endtime=self.end_time,
                                       meeting_body=meeting_body,
                                       conf_room=self.roomname,
+                                      timezone=self.timezone,
                                       ))
 
         header = "\"content-type: text/xml;charset=utf-8\""
