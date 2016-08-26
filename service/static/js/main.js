@@ -1,11 +1,11 @@
 var buildings = []
 var floors = ["1", "2", "3", "4", "5"];
 var times_hours = ["00", "01", "02","03",
-             "04", "05", "06", "07",
-             "08", "09", "10", "11",
-             "12", "13", "14", "15",
-             "16", "17", "18", "19",
-             "20", "21", "22", "23"];
+                   "4", "05", "06", "07",
+                   "08", "09", "10", "11",
+                   "12", "13", "14", "15",
+                   "16", "17", "18", "19",
+                   "20", "21", "22", "23"];
 var times_mins = ["00", "15", "30","45"];
 var duration_hours = ["0h", "1h", "2h","3h",
                       "4h", "5h", "6h", "7h"];
@@ -34,7 +34,11 @@ function init(){
     var date = new Date();
     var today = date.toISOString().split('T')[0];
     document.getElementById("bookDate").setAttribute('value', today);
-    document.getElementById("startTimeHourSelect").value = date.getHours();
+    var current_hour = date.getHours();
+    if (current_hour.length < 2) {
+        current_hour = "0" + current_hour
+    }
+    document.getElementById("startTimeHourSelect").value = current_hour;
 }
 
 function createCombo(container, data) {
