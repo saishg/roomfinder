@@ -87,7 +87,8 @@ function loadRooms(queryString) {
 function showFreeRooms(rooms_json) {
     for (var key in rooms_json) {
         var roomemail = rooms_json[key]["email"];
-        mytable.innerHTML += '<td><a href="#" onclick="bookRoom(\'' + key + '\' , \'' + roomemail + '\');">' + key + '</a></td>';
+//        mytable.innerHTML += '<td><a href="#" onclick="bookRoom(\'' + key + '\' , \'' + roomemail + '\');">' + key + '</a></td>';
+        mytable.innerHTML += '<td><input type="submit" value="Reserve" onclick="bookRoom(\'' + key + '\' , \'' + roomemail + '\');"></td><td>' + key + '</td>';
     }
     mytable.visiblity = true;
 }
