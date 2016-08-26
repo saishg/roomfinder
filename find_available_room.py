@@ -17,7 +17,7 @@ from string import Template
 URL = 'https://mail.cisco.com/ews/exchange.asmx'
 SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
-TIME_ZONE = ''
+SJ_TIME_ZONE = "420"
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -26,12 +26,13 @@ class AvailRoomFinder(object):
 
     def __init__(self, user, password,
                  start_time=TIME_NOW, duration='1h',
-                 roominfo='rooms.csv'):
+                 roominfo='rooms.csv', timezone=SJ_TIME_ZONE):
         self.rooms = self._read_room_list(roominfo)
         self.user = user
         self.password = password
         self.start_time = start_time
         self.room_info = {}
+        self.timezone = timezone
 
         try:
             if 'h' in duration and duration.endswith('m'):
@@ -66,7 +67,7 @@ class AvailRoomFinder(object):
         selected_rooms = {}
         for email in self.rooms:
             name, size = self.rooms[email]
-            if name.startswith(prefix) and size > min_size:
+            if name.startswith(prefix) and size >= min_size:
                 selected_rooms[email] = (name, size)
 
         selected_room_info = self.search(selected_rooms, print_to_stdout)
@@ -114,9 +115,10 @@ class AvailRoomFinder(object):
         xml = Template(xml_template)
 
         for email in selected_rooms:
-            data = unicode(xml.substitute(email=email,
-                                          starttime=self.start_time + TIME_ZONE,
-                                          endtime=self.end_time + TIME_ZONE))
+            data = unicode(xml.substitute(timezone=self.timezone,
+                                          email=email,
+                                          starttime=self.start_time,
+                                          endtime=self.end_time))
 
             header = "\"content-type: text/xml;charset=utf-8\""
             command = "curl --silent --header " + header \

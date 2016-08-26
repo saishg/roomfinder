@@ -4,9 +4,9 @@
   <soap:Body>
     <GetUserAvailabilityRequest xmlns="http://schemas.microsoft.com/exchange/services/2006/messages">
       <TimeZone xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
-        <Bias>420</Bias>
+        <Bias>$timezone</Bias>
         <StandardTime>
-          <Bias>-60</Bias>
+          <Bias>0</Bias>
           <Time>03:00:00</Time>
           <DayOrder>5</DayOrder>
           <Month>10</Month>
