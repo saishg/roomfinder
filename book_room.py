@@ -9,6 +9,7 @@ import os
 import subprocess
 import sys
 import urllib
+import time
 import xml.etree.ElementTree as ET
 
 from string import Template
@@ -22,11 +23,11 @@ TIME_1H_FROM_NOW = None
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-CONFIG = { 
+CONFIG = {
         'home' : PWD,
         'roomscsv' : PWD + '/rooms.csv',
-        'roomssearchcsv' : PWD + '/roomssearch.csv',  
-        'availibility_template' : PWD + '/getavailibility_template.xml', 
+        'roomssearchcsv' : PWD + '/roomssearch.csv',
+        'availibility_template' : PWD + '/getavailibility_template.xml',
         'URL': "https://mail.cisco.com/ews/exchange.asmx",
         'allrooms' :  PWD + '/allrooms.csv',
         }
@@ -57,6 +58,7 @@ class ReserveAvailRoom(object):
                 else:
                     hours, mins = 0, duration
         except ValueError:
+            print "**************" , duration
             hours, mins = 1, 0
 
         start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
@@ -68,14 +70,16 @@ class ReserveAvailRoom(object):
         xml_template = open("reserve_resource_template.xml", "r").read()
         xml = Template(xml_template)
         
-        roomid = self.roomid
-        
         useremail = self.user + '@cisco.com'
-        data = unicode(xml.substitute(resourceemail=roomid,
+        meeting_body = 'Meeting booked via Room Finder App by {0}'.format(useremail)
+        data = unicode(xml.substitute(resourceemail=self.roomid,
                                       useremail=useremail,
-                                      subject="RoomFinderApp",
+                                      subject="Room Finder Meeting",
                                       starttime=self.start_time,
-                                      endtime=self.end_time))
+                                      endtime=self.end_time,
+                                      meeting_body=meeting_body,
+                                      conf_room=selected_room,
+                                      ))
 
         header = "\"content-type: text/xml;charset=utf-8\""
         command = "curl --silent --header " + header \
@@ -84,20 +88,14 @@ class ReserveAvailRoom(object):
                        + "-u "+ self.user + ":" + self.password \
                        + " " + URL
         response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
-        print command
-        print "******",  response
+        
         tree = ET.fromstring(response)
-        if print_to_stdout:
-            print response
 
         return response
 
 def run():
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
-    parser.add_argument("-prefix", "--prefix",
-                        help="A prefix to search for. e.g. 'SJC19- SJC18-'",
-                        default='')
     parser.add_argument("-start", "--starttime",
                         help="Starttime e.g. 2014-07-02T11:00:00 (default = now)",
                         default=TIME_NOW)
