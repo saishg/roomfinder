@@ -35,6 +35,7 @@ class ReserveAvailRoom(object):
     def __init__(self, roomname, roomemail, user, password,
                  start_time=TIME_NOW,
                  duration='1h'):
+        self.roomname = roomname
         self.roomemail = roomemail
         self.user = user
         self.password = base64.b64decode(urllib.unquote(password))
@@ -60,20 +61,21 @@ class ReserveAvailRoom(object):
         start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
         self.end_time = (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
 
-    def reserve_room(self, selected_room, print_to_stdout=False):
+    def reserve_room(self, print_to_stdout=False):
         xml_template = open("reserve_resource_template.xml", "r").read()
         xml = Template(xml_template)
         
         useremail = self.user + '@cisco.com'
-        meeting_body = 'Meeting booked via Room Finder App by {0}'.format(useremail)
+        meeting_body = '{0} booked via RoomFinder by {1}'.format(self.roomname, useremail)
+        subject = 'RoomFinder: {0}'.format(self.roomname)
 
         data = unicode(xml.substitute(resourceemail=self.roomemail,
                                       useremail=useremail,
-                                      subject="Room Finder Meeting",
+                                      subject=subject,
                                       starttime=self.start_time,
                                       endtime=self.end_time,
                                       meeting_body=meeting_body,
-                                      conf_room=selected_room,
+                                      conf_room=self.roomname,
                                       ))
 
         header = "\"content-type: text/xml;charset=utf-8\""
@@ -105,8 +107,8 @@ def run():
     args = parser.parse_args()
     args.password = getpass.getpass("Password:")
 
-    room_finder = ReserveAvailRoom(args.user, args.password, args.starttime, args.endtime, args.file)
-    print room_finder.reserve_room(args.room, print_to_stdout=True)
+    room_finder = ReserveAvailRoom(args.room, args.user, args.password, args.starttime, args.endtime, args.file)
+    print room_finder.reserve_room(print_to_stdout=True)
 
 
 if __name__ == '__main__':

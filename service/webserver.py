@@ -88,7 +88,7 @@ def book_room():
                                    queryparam.password,
                                    queryparam.starttime, 
                                    queryparam.duration)
-    rooms_info = room_finder.reserve_room(queryparam.roomemail, print_to_stdout=True)
+    rooms_info = room_finder.reserve_room(print_to_stdout=True)
     
     if 'Success' in rooms_info:
         return "Room Reserved Successfully"
