@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import argparse
+import base64
 import csv
 import datetime
 import getpass
 import os
 import subprocess
 import sys
+import urllib
 import time
 import xml.etree.ElementTree as ET
 
@@ -34,31 +35,44 @@ CONFIG = {
 
 class ReserveAvailRoom(object):
 
-    def __init__(self, user, password, start_time=TIME_NOW, end_time=None, roominfo='rooms.csv'):
+    def __init__(self, roomid, user, password,
+                 start_time=TIME_NOW,
+                 roominfo='rooms.csv',
+                 duration='1h'):
+        self.roomid = roomid
         self.user = user
-        self.password = password
+        self.password = base64.b64decode(urllib.unquote(password))
         self.start_time = start_time
-        if end_time is None:
-            start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
-            self.end_time = (start + datetime.timedelta(hours=1)).isoformat()
-        else:
-            self.end_time = end_time
+        
+        try:
+            if 'h' in duration and duration.endswith('m'):
+                hours, mins = map(int, duration[:-1].split('h'))
+            elif duration.endswith('h'):
+                hours, mins = int(duration[:-1]), 0
+            elif duration.endswith('m'):
+                hours, mins = 0, int(duration[:-1])
+            else:
+                duration = int(duration)
+                if duration < 15:
+                    hours, mins = duration, 0
+                else:
+                    hours, mins = 0, duration
+        except ValueError:
+            print "**************" , duration
+            hours, mins = 1, 0
+
+        start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
+        self.end_time = (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
 
     def reserve_room(self, selected_room, print_to_stdout=False):
         room_info = {}
 
         xml_template = open("reserve_resource_template.xml", "r").read()
         xml = Template(xml_template)
-
-        resourceemail = ""
-        with open(CONFIG['allrooms'], 'r') as f:
-            for line in f.readlines():
-                if selected_room in line:
-                    resourceemail = line.split(',')[1]
-
+        
         useremail = self.user + '@cisco.com'
         meeting_body = 'Meeting booked via Room Finder App by {0}'.format(useremail)
-        data = unicode(xml.substitute(resourceemail=resourceemail,
+        data = unicode(xml.substitute(resourceemail=self.roomid,
                                       useremail=useremail,
                                       subject="Room Finder Meeting",
                                       starttime=self.start_time,
@@ -74,10 +88,8 @@ class ReserveAvailRoom(object):
                        + "-u "+ self.user + ":" + self.password \
                        + " " + URL
         response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
-
+        
         tree = ET.fromstring(response)
-        if print_to_stdout:
-            print response
 
         return response
 

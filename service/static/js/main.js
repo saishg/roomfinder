@@ -85,10 +85,32 @@ function loadRooms(queryString) {
 
 
 function showFreeRooms(rooms_json) {
+    var tbl = document.getElementById('mytable');
+    
     for (var key in rooms_json) {
-        mytable.innerHTML += "<td><link>" + key + "</link></td>";
+        tbl.innerHTML += '<td><a href="#" onclick="bookRoom(\'' + key + '\', \'' + rooms_json[key]["email"] + '\');">'+key+'</a></td>';
     }
+    console.log(tbl.innerHTML)
     mytable.visiblity = true;
+}
+function bookRoom(roomId) {
+    var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
+
+    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&roomid=${roomId}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
+    var xmlHttp = new XMLHttpRequest();
+
+    url = "http://localhost:5000/bookroom";
+    url = url.concat(queryString);
+
+    xmlHttp.open("GET", url, false); // false for synchronous request
+    xmlHttp.send(null);
+
+	console.log(roomId)
+	
+    var tbl = document.getElementById('mytable');
+	tbl.innerHTML += '<td></td>'
+	tbl.innerHTML += '<td>' + roomId + " " + xmlHttp.responseText + '</td>'
+	
 }
 
 

@@ -66,7 +66,7 @@ class AvailRoomFinder(object):
         selected_rooms = {}
         for email in self.rooms:
             name, size = self.rooms[email]
-            if name.startswith(prefix) and size >= min_size:
+            if name.startswith(prefix) and size > min_size:
                 selected_rooms[email] = (name, size)
 
         selected_room_info = self.search(selected_rooms, print_to_stdout)
@@ -96,7 +96,7 @@ class AvailRoomFinder(object):
                 status = "Tentative"
 
         name, size = self.rooms[email]
-        self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status}
+        self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status, 'email' : email}
 
         if print_to_stdout:
             print "{0:20s} {1:64s} {2:64s}".format(status + '-' + freebusy, self.rooms[email], email)

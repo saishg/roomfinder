@@ -2,7 +2,8 @@ import codecs
 from collections import namedtuple
 import csv
 import datetime
-from find_available_room import AvailRoomFinder
+from find_available_room import AvailRoomFinder 
+from book_room import ReserveAvailRoom
 from flask import Flask
 import flask
 import json
@@ -30,7 +31,8 @@ app = Flask(__name__, template_folder=CONFIG['home'] + '/service/templates')
 def index():
     return flask.render_template('index.html')
 
-QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees')
+QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees' )
+BookRoomQueryParam  = namedtuple('QueryParam', 'roomid, starttime, duration, user, password')
 
 @app.route('/showbuldings', methods=['GET'])
 def show_buldings():
@@ -48,7 +50,6 @@ def show_buldings():
 @app.route('/showrooms', methods=['GET'])
 def show_rooms():
     queryparam = QueryParam(
-#                             roomname=request.args.get('roomname'),
                             buildingname=request.args.get('buildingname'),
                             floor=request.args.get('floor'),
                             starttime=request.args.get('starttime'),
@@ -69,10 +70,27 @@ def show_rooms():
                                              print_to_stdout=True)
     except Exception as e:
         rooms_info = {"Error:" + str(e) : ""}
-    print queryparam
-    print prefix
-    print rooms_info
     return json.dumps(rooms_info)
+
+@app.route('/bookroom', methods=['GET'])
+def book_room():
+    queryparam = BookRoomQueryParam(
+                            roomid=request.args.get('roomid'),
+                            starttime=request.args.get('starttime'),
+                            duration=request.args.get('duration'),
+                            user = request.args.get('user'),
+                            password = request.args.get('password'),
+                            )
+    room_finder = ReserveAvailRoom(queryparam.roomid, queryparam.user, queryparam.password,
+                                      queryparam.starttime, 
+                                      CONFIG['roomssearchcsv'],
+                                      queryparam.duration)
+    rooms_info = room_finder.reserve_room(queryparam.roomid, print_to_stdout=True)
+    
+    if 'Success' in rooms_info:
+        return "Room Reserved Successfully"
+
+    return "Reserve Room failed"
 
 def _create_tmp_rooms_file(building_floor_name):
     if 'all' in building_floor_name:
