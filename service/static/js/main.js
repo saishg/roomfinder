@@ -85,18 +85,17 @@ function loadRooms(queryString) {
 
 
 function showFreeRooms(rooms_json) {
-    var tbl = document.getElementById('mytable');
-    
     for (var key in rooms_json) {
-        tbl.innerHTML += '<td><a href="#" onclick="bookRoom(\'' + key + '\', \'' + rooms_json[key]["email"] + '\');">'+key+'</a></td>';
+        var roomemail = rooms_json[key]["email"];
+        mytable.innerHTML += '<td><a href="#" onclick="bookRoom(\'' + key + '\' , \'' + roomemail + '\');">' + key + '</a></td>';
     }
-    console.log(tbl.innerHTML)
     mytable.visiblity = true;
 }
-function bookRoom(roomId) {
+
+function bookRoom(roomname, roomemail) {
     var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
 
-    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&roomid=${roomId}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
+    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&roomname=${roomname}&roomemail=${roomemail}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}`;
     var xmlHttp = new XMLHttpRequest();
 
     url = "http://localhost:5000/bookroom";
@@ -104,12 +103,7 @@ function bookRoom(roomId) {
 
     xmlHttp.open("GET", url, false); // false for synchronous request
     xmlHttp.send(null);
-
-	console.log(roomId)
-	
-    var tbl = document.getElementById('mytable');
-	tbl.innerHTML += '<td></td>'
-	tbl.innerHTML += '<td>' + roomId + " " + xmlHttp.responseText + '</td>'
+	mytable.innerHTML = '<tr><td>' + roomname + " " + xmlHttp.responseText + '</td></tr>';
 	
 }
 

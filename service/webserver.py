@@ -32,7 +32,7 @@ def index():
     return flask.render_template('index.html')
 
 QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees' )
-BookRoomQueryParam  = namedtuple('QueryParam', 'roomid, starttime, duration, user, password')
+BookRoomQueryParam  = namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password')
 
 @app.route('/showbuldings', methods=['GET'])
 def show_buldings():
@@ -75,17 +75,20 @@ def show_rooms():
 @app.route('/bookroom', methods=['GET'])
 def book_room():
     queryparam = BookRoomQueryParam(
-                            roomid=request.args.get('roomid'),
+                            roomname=request.args.get('roomname'),
+                            roomemail=request.args.get('roomemail'),
                             starttime=request.args.get('starttime'),
                             duration=request.args.get('duration'),
                             user = request.args.get('user'),
                             password = request.args.get('password'),
                             )
-    room_finder = ReserveAvailRoom(queryparam.roomid, queryparam.user, queryparam.password,
-                                      queryparam.starttime, 
-                                      CONFIG['roomssearchcsv'],
-                                      queryparam.duration)
-    rooms_info = room_finder.reserve_room(queryparam.roomid, print_to_stdout=True)
+    room_finder = ReserveAvailRoom(queryparam.roomname,
+                                   queryparam.roomemail,
+                                   queryparam.user,
+                                   queryparam.password,
+                                   queryparam.starttime, 
+                                   queryparam.duration)
+    rooms_info = room_finder.reserve_room(queryparam.roomemail, print_to_stdout=True)
     
     if 'Success' in rooms_info:
         return "Room Reserved Successfully"
