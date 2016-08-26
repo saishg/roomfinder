@@ -31,7 +31,7 @@ app = Flask(__name__, template_folder=CONFIG['home'] + '/service/templates')
 def index():
     return flask.render_template('index.html')
 
-QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees' )
+QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees, timezone' )
 BookRoomQueryParam  = namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password')
 
 @app.route('/showbuldings', methods=['GET'])
@@ -57,6 +57,7 @@ def show_rooms():
                             user = request.args.get('user'),
                             password = request.args.get('password'),
                             attendees = request.args.get('attendees'),
+                            timezone = request.args.get('timezone'),
                             )
 
     prefix = queryparam.buildingname + '-' + queryparam.floor
@@ -64,8 +65,10 @@ def show_rooms():
    
     try: 
         room_finder = AvailRoomFinder(queryparam.user, queryparam.password,
-                                      queryparam.starttime, queryparam.duration,
-                                      CONFIG['roomssearchcsv'])
+                                      queryparam.starttime,
+                                      duration=queryparam.duration,
+                                      roominfo=CONFIG['roomssearchcsv'],
+                                      timezone=queryparam.timezone)
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees),
                                              print_to_stdout=True)
     except Exception as e:
