@@ -77,30 +77,38 @@ class AvailRoomFinder(object):
                 free_room_info[email] = selected_room_info[email]
         return free_room_info
 
+    def room_name(self, email):
+        return self.rooms[email][0]
+
     def _query(self, command, email, print_to_stdout=False):
+        if print_to_stdout:
+            print "Querying for {}".format(self.room_name(email))
+
         response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
         if not response:
+            print "No response for room {}".format(self.room_name(email))
             return
 
-        tree = ET.fromstring(response)
+        try:
+            tree = ET.fromstring(response)
 
-        status = "Free"
-        elems = tree.findall(SCHEME_TYPES + "MergedFreeBusy")
-        freebusy = ''
-        for elem in elems:
-            freebusy = elem.text
-            if '2' in freebusy:
-                status = "Busy"
-            elif '3' in freebusy:
-                status = "Unavailable"
-            elif '1' in freebusy:
-                status = "Tentative"
+            status = "Free"
+            elems = tree.findall(SCHEME_TYPES + "MergedFreeBusy")
+            freebusy = ''
+            for elem in elems:
+                freebusy = elem.text
+                if '2' in freebusy:
+                    status = "Busy"
+                elif '3' in freebusy:
+                    status = "Unavailable"
+                elif '1' in freebusy:
+                    status = "Tentative"
 
-        name, size = self.rooms[email]
-        self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status, 'email' : email}
+            name, size = self.rooms[email]
+            self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status, 'email' : email}
 
-        if print_to_stdout:
-            print "{0:20s} {1:64s} {2:64s}".format(status + '-' + freebusy, self.rooms[email], email)
+        except Exception as e:
+            print "Exception querying room {}: {}".format(self.room_name(email), str(e))
 
     def search(self, selected_rooms=None, print_to_stdout=False):
         if selected_rooms is None:
@@ -108,8 +116,7 @@ class AvailRoomFinder(object):
         worker_threads = []
 
         if print_to_stdout:
-            print "Searching for a room from " + self.start_time + " to " + self.end_time + ":"
-            print "{0:20s} {1:64s} {2:64s}".format("Status", "Room", "Email")
+            print self.user + " searching for a room from " + self.start_time + " to " + self.end_time + ":"
 
         xml_template = open("getavailibility_template.xml", "r").read()
         xml = Template(xml_template)
@@ -134,6 +141,13 @@ class AvailRoomFinder(object):
         for thread in worker_threads:
             thread.join()
 
+        if print_to_stdout:
+            print "-" * 120
+            print "{0:40s} {1:64s} {2:20s}".format("Status", "Room", "Email")
+            print "-" * 120
+            for name, info in self.room_info.iteritems():
+                print "{0:40s} {1:64s} {2:20s}".format(info['status'] + '-' + info['freebusy'], name, info['email'])
+            print "-" * 120
         return self.room_info
 
 def run():

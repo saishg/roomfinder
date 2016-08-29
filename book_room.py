@@ -41,7 +41,7 @@ class ReserveAvailRoom(object):
         self.user = user
         self.password = base64.b64decode(urllib.unquote(password))
         self.start_time = start_time
-        self.timezone = timezone or SJ_TIME_ZONE
+        self.timezone = self._calc_timezone_str(timezone)
         
         try:
             if 'h' in duration and duration.endswith('m'):
@@ -57,11 +57,20 @@ class ReserveAvailRoom(object):
                 else:
                     hours, mins = 0, duration
         except ValueError:
-            print "**************" , duration
             hours, mins = 1, 0
 
         start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
         self.end_time = (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
+
+    def _calc_timezone_str(self, timezone):
+        try:
+            timezone = int(timezone)
+        except ValueError:
+            timezone = SJ_TIME_ZONE
+        hours_offset = timezone / 60
+        minutes_offset = timezone % 60
+        sign = "-" if hours_offset < 0 else ""
+        return "{}PT{}H{}M".format(sign, abs(hours_offset), abs(minutes_offset))
 
     def reserve_room(self, print_to_stdout=False):
         xml_template = open("reserve_resource_template.xml", "r").read()
