@@ -18,7 +18,9 @@ CONFIG = {
         'availibility_template' : os.path.join(PWD, 'getavailibility_template.xml'),
         'URL': "https://mail.cisco.com/ews/exchange.asmx",
         'allrooms' :  os.path.join(PWD, 'allrooms.csv'),
-        'certdir' : os.path.join(PWD, 'certdir')
+        'certdir' : os.path.join(PWD, 'certdir'),
+        'https' : True,
+        'port' : 5000,
         }
 
 app = Flask(__name__, template_folder=CONFIG['home'] + '/service/templates')
@@ -107,4 +109,7 @@ def create_context():
     return context
 
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True, host=socket.gethostname(), ssl_context=create_context(), port=5001)
+    if CONFIG['https']:
+        app.run(debug=True, threaded=True, host=socket.gethostname(), ssl_context=create_context(), port=CONFIG['port'])
+    else:
+        app.run(debug=True, threaded=True, host=socket.gethostname(), port=CONFIG['port'])
