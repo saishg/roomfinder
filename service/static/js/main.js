@@ -53,7 +53,6 @@ function loadBuildingNamesList() {
     xmlHttp.open( "GET", "http://localhost:5000/showbuldings", false ); // false for synchronous request
     xmlHttp.send( null );
     buildings = JSON.parse(xmlHttp.responseText);
-    //console.log(buildings);
 }
 
 //Example: http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
@@ -91,10 +90,15 @@ function loadRooms(queryString) {
 
 
 function showFreeRooms(rooms_json) {
+    mytable.innerHTML += "<td></td><td><small>Found " + Object.keys(rooms_json).length + " rooms</small></td>";
     for (var key in rooms_json) {
         var roomemail = rooms_json[key]["email"];
-//        mytable.innerHTML += '<td><a href="#" onclick="bookRoom(\'' + key + '\' , \'' + roomemail + '\');">' + key + '</a></td>';
-        mytable.innerHTML += '<td><input type="submit" value="Reserve" onclick="bookRoom(\'' + key + '\' , \'' + roomemail + '\');"></td><td>' + key + '</td>';
+        if (typeof roomemail != "undefined") {
+            mytable.innerHTML += '<td><input type="submit" value="Reserve" onclick="bookRoom(\'' + key + '\' , \'' + roomemail + '\');"></td><td>' + key + '</td>';
+        }
+        else {
+            mytable.innerHTML += '<td></td><td>' + key + '</td>';
+        }
     }
     mytable.visiblity = true;
 }
