@@ -90,9 +90,9 @@ def book_room():
     rooms_info = room_finder.reserve_room(print_to_stdout=True)
     
     if 'Success' in rooms_info:
-        return "Room Reserved Successfully"
+        return "reservation requested"
 
-    return "Reserve Room failed"
+    return "reservation failed"
 
 def _create_tmp_rooms_file(building_floor_name):
     if 'all' in building_floor_name:
@@ -101,4 +101,4 @@ def _create_tmp_rooms_file(building_floor_name):
         open(CONFIG['roomssearchcsv'],'w').writelines([ line for line in open(CONFIG['roomscsv']) if building_floor_name in line])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
