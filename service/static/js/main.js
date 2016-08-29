@@ -50,7 +50,7 @@ function createCombo(container, data) {
 
 function loadBuildingNamesList() {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", "http://localhost:5000/showbuldings", false ); // false for synchronous request
+    xmlHttp.open( "GET", "/showbuldings", false ); // false for synchronous request
     xmlHttp.send( null );
     buildings = JSON.parse(xmlHttp.responseText);
 }
@@ -77,7 +77,7 @@ function submitClickHandler() {
 
 function loadRooms(queryString) {
     var xmlHttp = new XMLHttpRequest();
-    url = "http://localhost:5000/showrooms";
+    url = "/showrooms";
     url = url.concat(queryString);
 
     xmlHttp.open("GET", url, false); // false for synchronous request
@@ -110,7 +110,7 @@ function bookRoom(roomname, roomemail) {
     var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&roomname=${roomname}&roomemail=${roomemail}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}&timezone=${timezone}`;
     var xmlHttp = new XMLHttpRequest();
 
-    url = "http://localhost:5000/bookroom";
+    url = "/bookroom";
     url = url.concat(queryString);
 
     xmlHttp.open("GET", url, false); // false for synchronous request

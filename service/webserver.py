@@ -1,22 +1,24 @@
 from collections import namedtuple
-from find_available_room import AvailRoomFinder 
+from find_available_room import AvailRoomFinder
 from book_room import ReserveAvailRoom
 import flask
 import json
 import os
+import socket
 
 from shutil import copyfile
 from flask import Flask, request
 
 PWD = os.getcwd()
 
-CONFIG = { 
+CONFIG = {
         'home' : PWD,
-        'roomscsv' : PWD + '/rooms.csv',
-        'roomssearchcsv' : PWD + '/roomssearch.csv',  
-        'availibility_template' : PWD + '/getavailibility_template.xml', 
+        'roomscsv' : os.path.join(PWD, 'rooms.csv'),
+        'roomssearchcsv' : os.path.join(PWD, 'roomssearch.csv'),
+        'availibility_template' : os.path.join(PWD, 'getavailibility_template.xml'),
         'URL': "https://mail.cisco.com/ews/exchange.asmx",
-        'allrooms' :  PWD + '/allrooms.csv',
+        'allrooms' :  os.path.join(PWD, 'allrooms.csv'),
+        'certdir' : os.path.join(PWD, 'certdir')
         }
 
 app = Flask(__name__, template_folder=CONFIG['home'] + '/service/templates')
@@ -39,7 +41,7 @@ def show_buldings():
     return json.dumps(buldings)
 
 
-# Example Query 
+# Example Query
 # http://127.0.0.1:5000/showrooms?building_floor_name=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password
 @app.route('/showrooms', methods=['GET'])
 def show_rooms():
@@ -56,8 +58,8 @@ def show_rooms():
 
     prefix = queryparam.buildingname + '-' + queryparam.floor
     _create_tmp_rooms_file(prefix)
-   
-    try: 
+
+    try:
         room_finder = AvailRoomFinder(queryparam.user, queryparam.password,
                                       queryparam.starttime,
                                       duration=queryparam.duration,
@@ -84,11 +86,11 @@ def book_room():
                                    queryparam.roomemail,
                                    queryparam.user,
                                    queryparam.password,
-                                   queryparam.starttime, 
+                                   queryparam.starttime,
                                    duration=queryparam.duration,
                                    timezone=queryparam.timezone)
     rooms_info = room_finder.reserve_room(print_to_stdout=True)
-    
+
     if 'Success' in rooms_info:
         return "reservation requested"
 
@@ -100,5 +102,9 @@ def _create_tmp_rooms_file(building_floor_name):
     else:
         open(CONFIG['roomssearchcsv'],'w').writelines([ line for line in open(CONFIG['roomscsv']) if building_floor_name in line])
 
+def create_context():
+    context = (os.path.join(CONFIG['certdir'], 'roomfinder.cert'), os.path.join(CONFIG['certdir'], 'roomfinder.key'))
+    return context
+
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True)
+    app.run(debug=True, threaded=True, host=socket.gethostname(), ssl_context=create_context(), port=5001)
