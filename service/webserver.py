@@ -17,7 +17,7 @@ CONFIG = {
         'roomssearchcsv' : os.path.join(PWD, 'roomssearch.csv'),
         'availibility_template' : os.path.join(PWD, 'getavailibility_template.xml'),
         'URL': "https://mail.cisco.com/ews/exchange.asmx",
-        'allrooms' :  os.path.join(PWD, 'allrooms.csv'),
+        'allrooms' :  os.path.join(PWD, 'rooms.csv'),
         'certdir' : os.path.join(PWD, 'certdir'),
         'https' : True,
         'port' : 5000,

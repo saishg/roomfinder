@@ -27,7 +27,7 @@ CONFIG = {
         'roomssearchcsv' : PWD + '/roomssearch.csv',
         'availibility_template' : PWD + '/getavailibility_template.xml',
         'URL': "https://mail.cisco.com/ews/exchange.asmx",
-        'allrooms' :  PWD + '/allrooms.csv',
+        'rooms' :  PWD + '/allrooms.csv',
         }
 
 
