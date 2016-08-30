@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import getpass
-import xml.etree.ElementTree as ET
 import argparse
+import common
 import csv
+import getpass
 import operator
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 
 from string import Template
 from string import letters
 from string import digits
-
-URL = 'https://mail.cisco.com/ews/exchange.asmx'
-SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -37,7 +35,7 @@ class RoomFinder(object):
                    + " --data '" + data \
                    + "' --ntlm " \
                    +  "-u "+ self.user + ":" + self.password \
-                   + " " + URL
+                   + " " + common.URL
         response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
 
         if not response.strip():
@@ -46,10 +44,10 @@ class RoomFinder(object):
 
         tree = ET.fromstring(response)
 
-        elems = tree.findall(SCHEME_TYPES + "Resolution")
+        elems = tree.findall(common.SCHEME_TYPES + "Resolution")
         for elem in elems:
-            email = elem.findall(SCHEME_TYPES + "EmailAddress")
-            name = elem.findall(SCHEME_TYPES + "DisplayName")
+            email = elem.findall(common.SCHEME_TYPES + "EmailAddress")
+            name = elem.findall(common.SCHEME_TYPES + "DisplayName")
             if len(email) and len(name):
                 roomsize = self.room_size(name[0].text)
                 if roomsize:
