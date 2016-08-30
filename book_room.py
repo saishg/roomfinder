@@ -2,40 +2,23 @@
 # -*- coding: utf-8 -*-
 import argparse
 import base64
+import common
 import datetime
 import getpass
-import os
 import subprocess
 import sys
 import urllib
 
 from string import Template
 
-PWD = os.getcwd()
-URL = 'https://mail.cisco.com/ews/exchange.asmx'
-SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
-TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
-TIME_1H_FROM_NOW = None
-SJ_TIME_ZONE = "420"
-
 reload(sys)
 sys.setdefaultencoding("utf-8")
-
-CONFIG = {
-        'home' : PWD,
-        'roomscsv' : PWD + '/rooms.csv',
-        'roomssearchcsv' : PWD + '/roomssearch.csv',
-        'availibility_template' : PWD + '/getavailibility_template.xml',
-        'URL': "https://mail.cisco.com/ews/exchange.asmx",
-        'allrooms' :  PWD + '/allrooms.csv',
-        }
-
 
 class ReserveAvailRoom(object):
 
     def __init__(self, roomname, roomemail, user, password,
-                 start_time=TIME_NOW,
-                 duration='1h', timezone=SJ_TIME_ZONE):
+                 start_time=common.TIME_NOW,
+                 duration='1h', timezone=common.SJ_TIME_ZONE):
         self.roomname = roomname
         self.roomemail = roomemail
         self.user = user
@@ -66,7 +49,7 @@ class ReserveAvailRoom(object):
         try:
             timezone = int(timezone)
         except ValueError:
-            timezone = SJ_TIME_ZONE
+            timezone = common.SJ_TIME_ZONE
         hours_offset = timezone / 60
         minutes_offset = timezone % 60
         sign = "-" if hours_offset < 0 else ""
@@ -95,7 +78,7 @@ class ReserveAvailRoom(object):
                        + " --data '" + data \
                        + "' --ntlm " \
                        + "-u "+ self.user + ":" + self.password \
-                       + " " + URL
+                       + " " + common.URL
         response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
         return response
 
@@ -104,10 +87,10 @@ def run():
     parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
     parser.add_argument("-start", "--starttime",
                         help="Starttime e.g. 2014-07-02T11:00:00 (default = now)",
-                        default=TIME_NOW)
+                        default=common.TIME_NOW)
     parser.add_argument("-end", "--endtime",
                         help="Endtime e.g. 2014-07-02T12:00:00 (default = now+1h)",
-                        default=TIME_1H_FROM_NOW)
+                        default=common.TIME_1H_FROM_NOW)
     parser.add_argument("-f", "--file",
                         help="csv filename with room info (default=rooms.csv).",
                         default="rooms.csv")

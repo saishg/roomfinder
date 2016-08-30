@@ -1,29 +1,16 @@
-from collections import namedtuple
-from find_available_room import AvailRoomFinder
-from book_room import ReserveAvailRoom
+import common
 import flask
 import json
 import os
 import socket
 
+from book_room import ReserveAvailRoom
+from collections import namedtuple
+from find_available_room import AvailRoomFinder
 from shutil import copyfile
 from flask import Flask, request
 
-PWD = os.getcwd()
-
-CONFIG = {
-        'home' : PWD,
-        'roomscsv' : os.path.join(PWD, 'rooms.csv'),
-        'roomssearchcsv' : os.path.join(PWD, 'roomssearch.csv'),
-        'availibility_template' : os.path.join(PWD, 'getavailibility_template.xml'),
-        'URL': "https://mail.cisco.com/ews/exchange.asmx",
-        'allrooms' :  os.path.join(PWD, 'allrooms.csv'),
-        'certdir' : os.path.join(PWD, 'certdir'),
-        'https' : True,
-        'port' : 5000,
-        }
-
-app = Flask(__name__, template_folder=CONFIG['home'] + '/service/templates')
+app = Flask(__name__, template_folder=common.TEMPLATE_FOLDER)
 
 @app.route('/')
 def index():
@@ -35,7 +22,7 @@ BookRoomQueryParam  = namedtuple('QueryParam', 'roomname, roomemail, starttime, 
 @app.route('/showbuldings', methods=['GET'])
 def show_buldings():
     buldings = []
-    with open(CONFIG['allrooms'],'r') as f:
+    with open(common.ROOMS_CSV, 'r') as f:
         for line in f.readlines():
             buldingname = line.split('-')[0]
             if buldingname not in buldings:
@@ -65,7 +52,7 @@ def show_rooms():
         room_finder = AvailRoomFinder(queryparam.user, queryparam.password,
                                       queryparam.starttime,
                                       duration=queryparam.duration,
-                                      roominfo=CONFIG['roomssearchcsv'],
+                                      roominfo=common.ROOMS_SEARCH_CSV,
                                       timezone=queryparam.timezone)
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees),
                                              print_to_stdout=True)
@@ -100,16 +87,16 @@ def book_room():
 
 def _create_tmp_rooms_file(building_floor_name):
     if 'all' in building_floor_name:
-        copyfile(CONFIG['roomscsv'], CONFIG['roomssearchcsv'])
+        copyfile(common.ROOMS_CSV, common.ROOMS_SEARCH_CSV)
     else:
-        open(CONFIG['roomssearchcsv'],'w').writelines([ line for line in open(CONFIG['roomscsv']) if building_floor_name in line])
+        open(common.ROOMS_SEARCH_CSV, 'w').writelines([ line for line in open(common.ROOMS_CSV) if building_floor_name in line])
 
 def create_context():
-    context = (os.path.join(CONFIG['certdir'], 'roomfinder.cert'), os.path.join(CONFIG['certdir'], 'roomfinder.key'))
+    context = (os.path.join(common.CERT_DIR, 'roomfinder.cert'), os.path.join(common.CERT_DIR, 'roomfinder.key'))
     return context
 
 if __name__ == '__main__':
-    if CONFIG['https']:
-        app.run(debug=True, threaded=True, host=socket.gethostname(), ssl_context=create_context(), port=CONFIG['port'])
+    if common.HTTPS_ENABLED:
+        app.run(debug=True, threaded=True, host=socket.gethostname(), ssl_context=create_context(), port=common.HTTPS_PORT)
     else:
-        app.run(debug=True, threaded=True, host=socket.gethostname(), port=CONFIG['port'])
+        app.run(debug=True, threaded=True, host=socket.gethostname(), port=common.HTTP_PORT)

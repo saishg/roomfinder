@@ -3,6 +3,7 @@
 
 import argparse
 import base64
+import common
 import csv
 import datetime
 import getpass
@@ -14,25 +15,20 @@ import xml.etree.ElementTree as ET
 
 from string import Template
 
-URL = 'https://mail.cisco.com/ews/exchange.asmx'
-SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
-TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
-SJ_TIME_ZONE = "420"
-
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 class AvailRoomFinder(object):
 
     def __init__(self, user, password,
-                 start_time=TIME_NOW, duration='1h',
-                 roominfo='rooms.csv', timezone=SJ_TIME_ZONE):
+                 start_time=common.TIME_NOW, duration='1h',
+                 roominfo='rooms.csv', timezone=common.SJ_TIME_ZONE):
         self.rooms = self._read_room_list(roominfo)
         self.user = user
         self.password = password
         self.start_time = start_time
         self.room_info = {}
-        self.timezone = timezone or SJ_TIME_ZONE
+        self.timezone = timezone or common.SJ_TIME_ZONE
 
         try:
             if 'h' in duration and duration.endswith('m'):
@@ -93,7 +89,7 @@ class AvailRoomFinder(object):
             tree = ET.fromstring(response)
 
             status = "Free"
-            elems = tree.findall(SCHEME_TYPES + "MergedFreeBusy")
+            elems = tree.findall(common.SCHEME_TYPES + "MergedFreeBusy")
             freebusy = ''
             for elem in elems:
                 freebusy = elem.text
@@ -132,7 +128,7 @@ class AvailRoomFinder(object):
                        + " --data '" + data \
                        + "' --ntlm " \
                        + "-u "+ self.user + ":" + base64.b64decode(urllib.unquote(self.password)) \
-                       + " " + URL
+                       + " " + common.URL
 
             thread = threading.Thread(target=self._query, args=(command, email, print_to_stdout))
             thread.start()
@@ -158,7 +154,7 @@ def run():
                         default='')
     parser.add_argument("-start", "--starttime",
                         help="Starttime e.g. 2014-07-02T11:00:00 (default = now)",
-                        default=TIME_NOW)
+                        default=common.TIME_NOW)
     parser.add_argument("-duration", "--duration",
                         help="Duration e.g. 1h or 15m (default = 1h)",
                         default='1h')
