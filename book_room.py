@@ -55,7 +55,7 @@ class ReserveAvailRoom(object):
         sign = "-" if hours_offset < 0 else ""
         return "{}PT{}H{}M".format(sign, abs(hours_offset), abs(minutes_offset))
 
-    def reserve_room(self, print_to_stdout=False):
+    def reserve_room(self):
         xml_template = open("reserve_resource_template.xml", "r").read()
         xml = Template(xml_template)
         
@@ -103,7 +103,7 @@ def run():
     args.password = getpass.getpass("Password:")
 
     room_finder = ReserveAvailRoom(args.room, args.user, args.password, args.starttime, args.endtime, args.file)
-    print room_finder.reserve_room(print_to_stdout=True)
+    room_finder.reserve_room()
 
 
 if __name__ == '__main__':

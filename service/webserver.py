@@ -54,8 +54,7 @@ def show_rooms():
                                       duration=queryparam.duration,
                                       roominfo=common.ROOMS_SEARCH_CSV,
                                       timezone=queryparam.timezone)
-        rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees),
-                                             print_to_stdout=True)
+        rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees))
     except Exception as e:
         rooms_info = {"Error: " + str(e) : ""}
     return json.dumps(rooms_info)
@@ -78,7 +77,7 @@ def book_room():
                                    queryparam.starttime,
                                    duration=queryparam.duration,
                                    timezone=queryparam.timezone)
-    rooms_info = room_finder.reserve_room(print_to_stdout=True)
+    rooms_info = room_finder.reserve_room()
 
     if 'Success' in rooms_info:
         return "reservation requested"

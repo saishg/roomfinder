@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 
 URL = 'https://mail.cisco.com/ews/exchange.asmx'
@@ -18,5 +19,8 @@ TEMPLATE_FOLDER = os.path.join(SERVICE_DIR, 'templates')
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
 TIME_1H_FROM_NOW = None
 SJ_TIME_ZONE = "420"
+
+logging.basicConfig(filename='access.log',level=logging.DEBUG)
+LOGGER = logging.getLogger('roomfinder')
 
 
