@@ -143,7 +143,7 @@ class AvailRoomFinder(object):
             OUTPUT_TABLE += "{0:40s} {1:64s} {2:20s}\n".format(info['status'] + '-' + info['freebusy'], name, info['email'])
         OUTPUT_TABLE += LINE_SEPARATOR
 
-        common.LOGGER.debug("%s", OUTPUT_TABLE)
+        common.LOGGER.debug("\n%s", OUTPUT_TABLE)
 
         return self.room_info
 

@@ -96,6 +96,6 @@ def create_context():
 
 if __name__ == '__main__':
     if common.HTTPS_ENABLED:
-        app.run(debug=True, threaded=True, host=socket.gethostname(), ssl_context=create_context(), port=common.HTTPS_PORT)
+        app.run(threaded=True, host=socket.gethostname(), ssl_context=create_context(), port=common.HTTPS_PORT)
     else:
-        app.run(debug=True, threaded=True, host=socket.gethostname(), port=common.HTTP_PORT)
+        app.run(threaded=True, host=socket.gethostname(), port=common.HTTP_PORT)
