@@ -59,14 +59,14 @@ class AvailRoomFinder(object):
 
         return rooms
 
-    def search_free(self, prefix, min_size=1, print_to_stdout=False):
+    def search_free(self, prefix, min_size=1):
         selected_rooms = {}
         for email in self.rooms:
             name, size = self.rooms[email]
             if name.startswith(prefix) and size >= min_size:
                 selected_rooms[email] = (name, size)
 
-        selected_room_info = self.search(selected_rooms, print_to_stdout)
+        selected_room_info = self.search(selected_rooms)
         free_room_info = {}
         for email in selected_room_info:
             if selected_room_info[email]['status'] == 'Free':
@@ -76,13 +76,12 @@ class AvailRoomFinder(object):
     def room_name(self, email):
         return self.rooms[email][0]
 
-    def _query(self, command, email, print_to_stdout=False):
-        if print_to_stdout:
-            print "Querying for {}".format(self.room_name(email))
+    def _query(self, command, email):
+        common.LOGGER.debug("Querying for %s", self.room_name(email))
 
         response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
         if not response:
-            print "No response for room {}".format(self.room_name(email))
+            common.LOGGER.info("No response for room %s", self.room_name(email))
             return
 
         try:
@@ -104,15 +103,14 @@ class AvailRoomFinder(object):
             self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status, 'email' : email}
 
         except Exception as e:
-            print "Exception querying room {}: {}".format(self.room_name(email), str(e))
+            common.LOGGER.warning("Exception querying room %s: %s", self.room_name(email), str(e))
 
-    def search(self, selected_rooms=None, print_to_stdout=False):
+    def search(self, selected_rooms=None):
         if selected_rooms is None:
             selected_rooms = self.rooms
         worker_threads = []
 
-        if print_to_stdout:
-            print self.user + " searching for a room from " + self.start_time + " to " + self.end_time + ":"
+        common.LOGGER.info("User %s searching for a room from %s to %s", self.user, self.start_time, self.end_time)
 
         xml_template = open("getavailibility_template.xml", "r").read()
         xml = Template(xml_template)
@@ -130,20 +128,23 @@ class AvailRoomFinder(object):
                        + "-u "+ self.user + ":" + base64.b64decode(urllib.unquote(self.password)) \
                        + " " + common.URL
 
-            thread = threading.Thread(target=self._query, args=(command, email, print_to_stdout))
+            thread = threading.Thread(target=self._query, args=(command, email))
             thread.start()
             worker_threads.append(thread)
 
         for thread in worker_threads:
             thread.join()
 
-        if print_to_stdout:
-            print "-" * 120
-            print "{0:40s} {1:64s} {2:20s}".format("Status", "Room", "Email")
-            print "-" * 120
-            for name, info in self.room_info.iteritems():
-                print "{0:40s} {1:64s} {2:20s}".format(info['status'] + '-' + info['freebusy'], name, info['email'])
-            print "-" * 120
+        LINE_SEPARATOR = "-" * 120 + "\n"
+        OUTPUT_TABLE = LINE_SEPARATOR + \
+                       "{0:40s} {1:64s} {2:20s}\n".format("Status", "Room", "Email") + \
+                       LINE_SEPARATOR
+        for name, info in self.room_info.iteritems():
+            OUTPUT_TABLE += "{0:40s} {1:64s} {2:20s}\n".format(info['status'] + '-' + info['freebusy'], name, info['email'])
+        OUTPUT_TABLE += LINE_SEPARATOR
+
+        common.LOGGER.debug("%s", OUTPUT_TABLE)
+
         return self.room_info
 
 def run():
@@ -166,7 +167,7 @@ def run():
     args.password = base64.b64encode(getpass.getpass("Password:"))
 
     room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.duration, args.file)
-    print room_finder.search_free(prefix=args.prefix, print_to_stdout=True)
+    room_finder.search_free(prefix=args.prefix)
 
 
 if __name__ == '__main__':

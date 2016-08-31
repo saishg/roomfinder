@@ -63,7 +63,7 @@ class RoomFinder(object):
                 prefix_deep = prefix + " " + symbol
                 rooms_found.update(self._search(prefix_deep))
 
-        print "Search for prefix '" + prefix + "' yielded " + str(len(rooms_found)) + " rooms."
+        common.LOGGER.info("Search for prefix '%s' yielded %d rooms.", prefix, str(len(rooms_found)))
         self.rooms.update(self._search(prefix))
 
     def room_size(self, roomname):
@@ -74,7 +74,7 @@ class RoomFinder(object):
 
     def dump(self, filename='rooms.csv'):
         if not len(self.rooms):
-            print "Check your arguments for mistakes"
+            common.LOGGER.warning("No results found, check your arguments for mistakes")
             return 0
 
         with open(filename, "wb") as fhandle:
