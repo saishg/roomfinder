@@ -29,6 +29,7 @@ class AvailRoomFinder(object):
         self.start_time = start_time
         self.room_info = {}
         self.timezone = timezone or common.SJ_TIME_ZONE
+        self.error = None
 
         try:
             if 'h' in duration and duration.endswith('m'):
@@ -81,7 +82,8 @@ class AvailRoomFinder(object):
 
         response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
         if not response:
-            common.LOGGER.info("No response for room %s", self.room_name(email))
+            common.LOGGER.warning("No response for room %s", self.room_name(email))
+            self.error = Exception("Authentication failure")
             return
 
         try:
@@ -134,6 +136,9 @@ class AvailRoomFinder(object):
 
         for thread in worker_threads:
             thread.join()
+
+            if self.error is not None:
+                raise self.error
 
         LINE_SEPARATOR = "-" * 120 + "\n"
         OUTPUT_TABLE = LINE_SEPARATOR + \

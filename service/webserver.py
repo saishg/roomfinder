@@ -56,7 +56,7 @@ def show_rooms():
                                       timezone=queryparam.timezone)
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees))
     except Exception as e:
-        rooms_info = {"Error: " + str(e) : ""}
+        rooms_info = {"Error" : str(e)}
     return json.dumps(rooms_info)
 
 @app.route('/bookroom', methods=['GET'])

@@ -90,6 +90,13 @@ function loadRooms(queryString) {
 
 
 function showFreeRooms(rooms_json) {
+    error = rooms_json["Error"];
+    console.log(error);
+    if (typeof error != "undefined") {
+        mytable.innerHTML += "<td>Error: " + error + "</td>";
+        return;
+    }
+
     mytable.innerHTML += "<td></td><td><small>Found " + Object.keys(rooms_json).length + " rooms</small></td>";
     for (var key in rooms_json) {
         var roomemail = rooms_json[key]["email"];
