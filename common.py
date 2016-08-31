@@ -22,5 +22,4 @@ SJ_TIME_ZONE = "420"
 
 logging.basicConfig(filename='access.log',level=logging.DEBUG)
 LOGGER = logging.getLogger('roomfinder')
-
-
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
