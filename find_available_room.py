@@ -80,7 +80,7 @@ class AvailRoomFinder(object):
         common.LOGGER.debug("Querying for %s", room_name)
 
         try:
-            room_info = self.exchange_api.is_room_available( \
+            room_info = self.exchange_api.room_status( \
                                 room_email=email,
                                 start_time=self.start_time,
                                 end_time=self.end_time,
