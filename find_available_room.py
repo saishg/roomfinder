@@ -31,25 +31,7 @@ class AvailRoomFinder(object):
         self.timezone = timezone or common.SJ_TIME_ZONE
         self.error = None
         self.exchange_api = exchange_api.ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
-
-        try:
-            if 'h' in duration and duration.endswith('m'):
-                hours, mins = map(int, duration[:-1].split('h'))
-            elif duration.endswith('h'):
-                hours, mins = int(duration[:-1]), 0
-            elif duration.endswith('m'):
-                hours, mins = 0, int(duration[:-1])
-            else:
-                duration = int(duration)
-                if duration < 15:
-                    hours, mins = duration, 0
-                else:
-                    hours, mins = 0, duration
-        except ValueError:
-            hours, mins = 1, 0
-
-        start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
-        self.end_time = (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
+        self.end_time = common.end_time(self.start_time, duration)
 
     def _read_room_list(self, filename):
         rooms = {}
