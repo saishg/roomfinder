@@ -5,16 +5,11 @@ import argparse
 import base64
 import common
 import csv
-import datetime
 import exchange_api
 import getpass
-import subprocess
 import sys
 import threading
 import urllib
-import xml.etree.ElementTree as ET
-
-from string import Template
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -83,9 +78,6 @@ class AvailRoomFinder(object):
 
         common.LOGGER.info("User %s searching for a room from %s to %s", self.user, self.start_time, self.end_time)
 
-        xml_template = open("getavailibility_template.xml", "r").read()
-        xml = Template(xml_template)
-
         for email in selected_rooms:
             thread = threading.Thread(target=self._query, args=(email, ))
             thread.start()
@@ -95,7 +87,7 @@ class AvailRoomFinder(object):
             thread.join()
 
             if self.error is not None:
-                raise self.error
+                raise self.error # pylint: disable=E0702
 
         LINE_SEPARATOR = "-" * 120 + "\n"
         OUTPUT_TABLE = LINE_SEPARATOR + \
