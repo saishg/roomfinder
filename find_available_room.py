@@ -91,6 +91,7 @@ class AvailRoomFinder(object):
             self.room_info[room_name] = room_info
 
         except Exception as e:
+            self.error = e
             common.LOGGER.warning("Exception querying room %s: %s", room_name, str(e))
 
     def search(self, selected_rooms=None):
