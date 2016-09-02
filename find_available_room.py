@@ -18,8 +18,8 @@ class AvailRoomFinder(object):
 
     def __init__(self, user, password,
                  start_time=common.TIME_NOW, duration='1h',
-                 roominfo='rooms.csv', timezone=common.SJ_TIME_ZONE):
-        self.rooms = self._read_room_list(roominfo)
+                 filename='rooms.csv', timezone=common.SJ_TIME_ZONE):
+        self.rooms = self._read_room_list(filename)
         self.user = user
         self.start_time = start_time
         self.room_info = {}
@@ -120,7 +120,9 @@ def run():
     args = parser.parse_args()
     args.password = base64.b64encode(getpass.getpass("Password:"))
 
-    room_finder = AvailRoomFinder(args.user, args.password, args.starttime, args.duration, args.file)
+    room_finder = AvailRoomFinder(user=args.user, password=args.password,
+                                  start_time=args.starttime, duration=args.duration,
+                                  filename=args.file)
     room_finder.search_free(prefix=args.prefix)
 
 

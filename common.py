@@ -15,7 +15,6 @@ CERT_DIR = os.path.join(PWD, 'certdir')
 TEMPLATE_FOLDER = os.path.join(SERVICE_DIR, 'templates')
 
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
-TIME_1H_FROM_NOW = None
 SJ_TIME_ZONE = "420"
 
 logging.basicConfig(filename='access.log',

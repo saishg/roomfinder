@@ -3,7 +3,6 @@
 import argparse
 import base64
 import common
-import datetime
 import exchange_api
 import getpass
 import sys
@@ -14,15 +13,18 @@ sys.setdefaultencoding("utf-8")
 
 class ReserveAvailRoom(object):
 
-    def __init__(self, roomname, roomemail, user, password,
-                 start_time=common.TIME_NOW,
-                 duration='1h', timezone=common.SJ_TIME_ZONE):
+    def __init__(self, user, password,
+                 roomname, roomemail,
+                 start_time=common.TIME_NOW, duration='1h',
+                 raw_password=None,
+                 timezone=common.SJ_TIME_ZONE):
+        self.user = user
         self.roomname = roomname
         self.roomemail = roomemail
-        self.user = user
         self.start_time = start_time
         self.timezone = self._calc_timezone_str(timezone)
-        self.exchange_api = exchange_api.ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
+        password = raw_password or base64.b64decode(urllib.unquote(password))
+        self.exchange_api = exchange_api.ExchangeApi(user, password)
         self.end_time = common.end_time(self.start_time, duration)
 
     def _calc_timezone_str(self, timezone):
@@ -50,21 +52,22 @@ def run():
     parser.add_argument("-start", "--starttime",
                         help="Starttime e.g. 2014-07-02T11:00:00 (default = now)",
                         default=common.TIME_NOW)
-    parser.add_argument("-end", "--endtime",
-                        help="Endtime e.g. 2014-07-02T12:00:00 (default = now+1h)",
-                        default=common.TIME_1H_FROM_NOW)
-    parser.add_argument("-f", "--file",
-                        help="csv filename with room info (default=rooms.csv).",
-                        default="rooms.csv")
-
-    parser.add_argument("-r", "--room",
-                        help="Name of conf room",
+    parser.add_argument("-d", "--duration",
+                        help="Duration e.g. 30m (default = 1h)",
+                        default='1h')
+    parser.add_argument("-e", "--roomemail",
+                        help="Email address of room",
+                        required=True)
+    parser.add_argument("-r", "--roomname",
+                        help="Name of room",
                         required=True)
 
     args = parser.parse_args()
-    args.password = getpass.getpass("Password:")
+    args.password = base64.b64encode(getpass.getpass("Password:"))
 
-    room_finder = ReserveAvailRoom(args.room, args.user, args.password, args.starttime, args.endtime, args.file)
+    room_finder = ReserveAvailRoom(user=args.user, password=args.password,
+                                   roomname=args.roomname, roomemail=args.roomemail,
+                                   start_time=args.starttime, duration=args.duration)
     room_finder.reserve_room()
 
 
