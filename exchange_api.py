@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import common
 import pipes
 import string
 import subprocess
@@ -11,8 +10,11 @@ import xml.etree.ElementTree as ET
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+URL = 'https://mail.cisco.com/ews/exchange.asmx'
+SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 AVAILABILITY_XML = None
 RESERVE_XML = None
+FIND_XML = None
 
 class ExchangeApi(object):
 
@@ -22,7 +24,7 @@ class ExchangeApi(object):
                        + " --data '{}'" \
                        + " --ntlm " \
                        + "-u " + pipes.quote(self.user) + ":" + pipes.quote(password) \
-                       + " " + common.URL
+                       + " " + URL
 
     def _read_template(self, filename):
         with open(filename, "r") as fhandle:
@@ -30,7 +32,10 @@ class ExchangeApi(object):
 
     def _curl(self, post_data):
         curl_command = self.command.format(post_data)
-        return subprocess.Popen(curl_command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+        response = subprocess.Popen(curl_command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+        if not response:
+            raise Exception("Authentication failure")
+        return response
 
     def room_status(self, room_email, start_time, end_time, timezone_offset):
         global AVAILABILITY_XML
@@ -43,13 +48,10 @@ class ExchangeApi(object):
                                                    endtime=end_time))
 
         response = self._curl(data)
-        if not response:
-            raise Exception("Authentication failure")
 
         tree = ET.fromstring(response)
-
         status = "Free"
-        elems = tree.findall(common.SCHEME_TYPES + "MergedFreeBusy")
+        elems = tree.findall(SCHEME_TYPES + "MergedFreeBusy")
         freebusy = ''
         for elem in elems:
             freebusy = elem.text
@@ -83,3 +85,29 @@ class ExchangeApi(object):
 
         response = self._curl(data)
         return 'Success' in response
+
+    def _parse_room_size(self, roomname):
+        try:
+            return int(roomname[roomname.find('(') + 1 : roomname.find(')')])
+        except ValueError:
+            return 0
+
+    def find_rooms(self, prefix):
+        global FIND_XML
+        if FIND_XML is None:
+            FIND_XML = self._read_template("resolvenames_template.xml")
+
+        room_info = {}
+        data = unicode(FIND_XML.substitute(name=prefix))
+        response = self._curl(data)
+
+        tree = ET.fromstring(response)
+        elems = tree.findall(SCHEME_TYPES + "Resolution")
+        for elem in elems:
+            email = elem.findall(SCHEME_TYPES + "EmailAddress")
+            name = elem.findall(SCHEME_TYPES + "DisplayName")
+            if len(email) and len(name):
+                roomsize = self._parse_room_size(name[0].text)
+                if roomsize:
+                    room_info[email[0].text] = (name[0].text, roomsize)
+        return room_info

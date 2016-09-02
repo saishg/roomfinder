@@ -2,8 +2,6 @@ import datetime
 import logging
 import os
 
-URL = 'https://mail.cisco.com/ews/exchange.asmx'
-SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 HTTPS_ENABLED = True
 HTTP_PORT = 8080
 HTTPS_PORT = 8443

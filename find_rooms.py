@@ -5,14 +5,10 @@ import argparse
 import common
 import csv
 import getpass
+import exchange_api
 import operator
-import subprocess
+import string
 import sys
-import xml.etree.ElementTree as ET
-
-from string import Template
-from string import letters
-from string import digits
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -21,56 +17,23 @@ class RoomFinder(object):
 
     def __init__(self, user, password):
         self.user = user
-        self.password = password
-        xml_template = open("resolvenames_template.xml", "r").read()
-        self.xml = Template(xml_template)
+        self.exchange_api = exchange_api.ExchangeApi(self.user, password)
         self.rooms = {}
 
     def _search(self, prefix):
-        tmp_rooms = {}
-        data = unicode(self.xml.substitute(name=prefix))
-
-        header = '"content-type: text/xml;charset=utf-8"'
-        command = "curl --silent --header " + header \
-                   + " --data '" + data \
-                   + "' --ntlm " \
-                   +  "-u "+ self.user + ":" + self.password \
-                   + " " + common.URL
-        response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
-
-        if not response.strip():
-            # something went wrong
-            return tmp_rooms
-
-        tree = ET.fromstring(response)
-
-        elems = tree.findall(common.SCHEME_TYPES + "Resolution")
-        for elem in elems:
-            email = elem.findall(common.SCHEME_TYPES + "EmailAddress")
-            name = elem.findall(common.SCHEME_TYPES + "DisplayName")
-            if len(email) and len(name):
-                roomsize = self.room_size(name[0].text)
-                if roomsize:
-                    tmp_rooms[email[0].text] = (name[0].text, roomsize)
-        return tmp_rooms
+        return self.exchange_api.find_rooms(prefix=prefix)
 
     def search(self, prefix, deep=False):
         rooms_found = self._search(prefix)
 
         if deep:
-            symbols = letters + digits
+            symbols = string.letters + string.digits
             for symbol in symbols:
                 prefix_deep = prefix + " " + symbol
                 rooms_found.update(self._search(prefix_deep))
 
-        common.LOGGER.info("Search for prefix '%s' yielded %d rooms.", prefix, str(len(rooms_found)))
+        common.LOGGER.info("Search for prefix '%s' yielded %d rooms.", prefix, len(rooms_found))
         self.rooms.update(self._search(prefix))
-
-    def room_size(self, roomname):
-        try:
-            return int(roomname[roomname.find('(') + 1 : roomname.find(')')])
-        except ValueError:
-            return 0
 
     def dump(self, filename='rooms.csv'):
         if not len(self.rooms):
