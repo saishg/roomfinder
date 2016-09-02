@@ -49,10 +49,11 @@ def show_rooms():
     _create_tmp_rooms_file(prefix)
 
     try:
-        room_finder = AvailRoomFinder(queryparam.user, queryparam.password,
-                                      queryparam.starttime,
+        room_finder = AvailRoomFinder(user=queryparam.user,
+                                      password=queryparam.password,
+                                      start_time=queryparam.starttime,
                                       duration=queryparam.duration,
-                                      roominfo=common.ROOMS_SEARCH_CSV,
+                                      filename=common.ROOMS_SEARCH_CSV,
                                       timezone=queryparam.timezone)
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees))
     except Exception as e:
@@ -70,11 +71,11 @@ def book_room():
                             password = request.args.get('password'),
                             timezone = request.args.get('timezone'),
                             )
-    room_finder = ReserveAvailRoom(queryparam.roomname,
-                                   queryparam.roomemail,
-                                   queryparam.user,
-                                   queryparam.password,
-                                   queryparam.starttime,
+    room_finder = ReserveAvailRoom(user=queryparam.user,
+                                   password=queryparam.password,
+                                   roomname=queryparam.roomname,
+                                   roomemail=queryparam.roomemail,
+                                   start_time=queryparam.starttime,
                                    duration=queryparam.duration,
                                    timezone=queryparam.timezone)
     try:
