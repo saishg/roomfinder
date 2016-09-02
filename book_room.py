@@ -4,12 +4,10 @@ import argparse
 import base64
 import common
 import datetime
+import exchange_api
 import getpass
-import subprocess
 import sys
 import urllib
-
-from string import Template
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -22,9 +20,9 @@ class ReserveAvailRoom(object):
         self.roomname = roomname
         self.roomemail = roomemail
         self.user = user
-        self.password = base64.b64decode(urllib.unquote(password))
         self.start_time = start_time
         self.timezone = self._calc_timezone_str(timezone)
+        self.exchange_api = exchange_api.ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
         
         try:
             if 'h' in duration and duration.endswith('m'):
@@ -56,30 +54,12 @@ class ReserveAvailRoom(object):
         return "{}PT{}H{}M".format(sign, abs(hours_offset), abs(minutes_offset))
 
     def reserve_room(self):
-        xml_template = open("reserve_resource_template.xml", "r").read()
-        xml = Template(xml_template)
-        
-        useremail = self.user + '@cisco.com'
-        meeting_body = '{0} booked via RoomFinder by {1}'.format(self.roomname, useremail)
-        subject = 'RoomFinder: {0}'.format(self.roomname)
-
-        data = unicode(xml.substitute(resourceemail=self.roomemail,
-                                      useremail=useremail,
-                                      subject=subject,
-                                      starttime=self.start_time,
-                                      endtime=self.end_time,
-                                      meeting_body=meeting_body,
-                                      conf_room=self.roomname,
-                                      timezone=self.timezone,
-                                      ))
-
-        header = "\"content-type: text/xml;charset=utf-8\""
-        command = "curl --silent --header " + header \
-                       + " --data '" + data \
-                       + "' --ntlm " \
-                       + "-u "+ self.user + ":" + self.password \
-                       + " " + common.URL
-        response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+        response = self.exchange_api.reserve_room( \
+                            room_email=self.roomemail,
+                            room_name=self.roomname,
+                            start_time=self.start_time,
+                            end_time=self.end_time,
+                            timezone_offset=self.timezone)
         return response
 
 def run():
