@@ -5,16 +5,11 @@ import argparse
 import base64
 import common
 import csv
-import datetime
 import exchange_api
 import getpass
-import subprocess
 import sys
 import threading
 import urllib
-import xml.etree.ElementTree as ET
-
-from string import Template
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -31,25 +26,7 @@ class AvailRoomFinder(object):
         self.timezone = timezone or common.SJ_TIME_ZONE
         self.error = None
         self.exchange_api = exchange_api.ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
-
-        try:
-            if 'h' in duration and duration.endswith('m'):
-                hours, mins = map(int, duration[:-1].split('h'))
-            elif duration.endswith('h'):
-                hours, mins = int(duration[:-1]), 0
-            elif duration.endswith('m'):
-                hours, mins = 0, int(duration[:-1])
-            else:
-                duration = int(duration)
-                if duration < 15:
-                    hours, mins = duration, 0
-                else:
-                    hours, mins = 0, duration
-        except ValueError:
-            hours, mins = 1, 0
-
-        start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
-        self.end_time = (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
+        self.end_time = common.end_time(self.start_time, duration)
 
     def _read_room_list(self, filename):
         rooms = {}
@@ -101,9 +78,6 @@ class AvailRoomFinder(object):
 
         common.LOGGER.info("User %s searching for a room from %s to %s", self.user, self.start_time, self.end_time)
 
-        xml_template = open("getavailibility_template.xml", "r").read()
-        xml = Template(xml_template)
-
         for email in selected_rooms:
             thread = threading.Thread(target=self._query, args=(email, ))
             thread.start()
@@ -113,7 +87,7 @@ class AvailRoomFinder(object):
             thread.join()
 
             if self.error is not None:
-                raise self.error
+                raise self.error # pylint: disable=E0702
 
         LINE_SEPARATOR = "-" * 120 + "\n"
         OUTPUT_TABLE = LINE_SEPARATOR + \
