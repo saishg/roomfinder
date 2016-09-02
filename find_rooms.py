@@ -15,10 +15,19 @@ sys.setdefaultencoding("utf-8")
 
 class RoomFinder(object):
 
-    def __init__(self, user, password):
+    def __init__(self, user, password, filename='rooms.csv', append=True):
         self.user = user
+        self.filename = filename
         self.exchange_api = exchange_api.ExchangeApi(self.user, password)
         self.rooms = {}
+        if append:
+            self._load()
+
+    def _load(self):
+        with open(self.filename, 'r') as fhandle:
+            reader = csv.reader(fhandle)
+            for row in reader:
+                self.rooms[row[1]] = row[0], int(row[2])
 
     def _search(self, prefix):
         return self.exchange_api.find_rooms(prefix=prefix)
@@ -35,12 +44,12 @@ class RoomFinder(object):
         common.LOGGER.info("Search for prefix '%s' yielded %d rooms.", prefix, len(rooms_found))
         self.rooms.update(self._search(prefix))
 
-    def dump(self, filename='rooms.csv'):
+    def dump(self):
         if not len(self.rooms):
             common.LOGGER.warning("No results found, check your arguments for mistakes")
             return 0
 
-        with open(filename, "wb") as fhandle:
+        with open(self.filename, "wb") as fhandle:
             writer = csv.writer(fhandle)
             for email, room_info in sorted(self.rooms.iteritems(), key=operator.itemgetter(1)):
                 name, size = room_info
