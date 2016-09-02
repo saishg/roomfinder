@@ -77,12 +77,10 @@ def book_room():
                                    queryparam.starttime,
                                    duration=queryparam.duration,
                                    timezone=queryparam.timezone)
-    rooms_info = room_finder.reserve_room()
-
-    if 'Success' in rooms_info:
+    if room_finder.reserve_room():
         return "reservation requested"
-
-    return "reservation failed"
+    else:
+        return "reservation failed"
 
 def _create_tmp_rooms_file(building_floor_name):
     if 'all' in building_floor_name:

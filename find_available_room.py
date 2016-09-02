@@ -6,6 +6,7 @@ import base64
 import common
 import csv
 import datetime
+import exchange_api
 import getpass
 import subprocess
 import sys
@@ -25,11 +26,11 @@ class AvailRoomFinder(object):
                  roominfo='rooms.csv', timezone=common.SJ_TIME_ZONE):
         self.rooms = self._read_room_list(roominfo)
         self.user = user
-        self.password = password
         self.start_time = start_time
         self.room_info = {}
         self.timezone = timezone or common.SJ_TIME_ZONE
         self.error = None
+        self.exchange_api = exchange_api.ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
 
         try:
             if 'h' in duration and duration.endswith('m'):
@@ -74,38 +75,23 @@ class AvailRoomFinder(object):
                 free_room_info[email] = selected_room_info[email]
         return free_room_info
 
-    def room_name(self, email):
-        return self.rooms[email][0]
-
-    def _query(self, command, email):
-        common.LOGGER.debug("Querying for %s", self.room_name(email))
-
-        response = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
-        if not response:
-            common.LOGGER.warning("No response for room %s", self.room_name(email))
-            self.error = Exception("Authentication failure")
-            return
+    def _query(self, email):
+        room_name, room_size = self.rooms[email]
+        common.LOGGER.debug("Querying for %s", room_name)
 
         try:
-            tree = ET.fromstring(response)
+            room_info = self.exchange_api.room_status( \
+                                room_email=email,
+                                start_time=self.start_time,
+                                end_time=self.end_time,
+                                timezone_offset=self.timezone)
 
-            status = "Free"
-            elems = tree.findall(common.SCHEME_TYPES + "MergedFreeBusy")
-            freebusy = ''
-            for elem in elems:
-                freebusy = elem.text
-                if '2' in freebusy:
-                    status = "Busy"
-                elif '3' in freebusy:
-                    status = "Unavailable"
-                elif '1' in freebusy:
-                    status = "Tentative"
-
-            name, size = self.rooms[email]
-            self.room_info[name] = {'size': size, 'freebusy': freebusy, 'status': status, 'email' : email}
+            room_info['size'] = room_size
+            room_info['name'] = room_name
+            self.room_info[room_name] = room_info
 
         except Exception as e:
-            common.LOGGER.warning("Exception querying room %s: %s", self.room_name(email), str(e))
+            common.LOGGER.warning("Exception querying room %s: %s", room_name, str(e))
 
     def search(self, selected_rooms=None):
         if selected_rooms is None:
@@ -118,19 +104,7 @@ class AvailRoomFinder(object):
         xml = Template(xml_template)
 
         for email in selected_rooms:
-            data = unicode(xml.substitute(timezone=self.timezone,
-                                          email=email,
-                                          starttime=self.start_time,
-                                          endtime=self.end_time))
-
-            header = "\"content-type: text/xml;charset=utf-8\""
-            command = "curl --silent --header " + header \
-                       + " --data '" + data \
-                       + "' --ntlm " \
-                       + "-u "+ self.user + ":" + base64.b64decode(urllib.unquote(self.password)) \
-                       + " " + common.URL
-
-            thread = threading.Thread(target=self._query, args=(command, email))
+            thread = threading.Thread(target=self._query, args=(email, ))
             thread.start()
             worker_threads.append(thread)
 
