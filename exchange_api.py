@@ -10,7 +10,8 @@ import xml.etree.ElementTree as ET
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-URL = 'https://mail.cisco.com/ews/exchange.asmx'
+DOMAIN = 'cisco.com'
+URL = 'https://mail.{}/ews/exchange.asmx'.format(DOMAIN)
 SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
 AVAILABILITY_XML = None
 RESERVE_XML = None
@@ -69,7 +70,7 @@ class ExchangeApi(object):
         if RESERVE_XML is None:
             RESERVE_XML = self._read_template("reserve_resource_template.xml")
         
-        user_email = self.user + '@cisco.com'
+        user_email = self.user + '@' + DOMAIN
         meeting_body = '{0} booked via RoomFinder by {1}'.format(room_name, user_email)
         subject = 'RoomFinder: {0}'.format(room_name)
 
