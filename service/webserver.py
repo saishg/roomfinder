@@ -5,9 +5,7 @@ Webservice APIs for room finder backend
 import collections
 import json
 import os
-import shutil
 import socket
-
 
 import common
 import flask
@@ -52,14 +50,13 @@ def show_rooms():
                             timezone=flask.request.args.get('timezone'))
 
     prefix = queryparam.buildingname + '-' + queryparam.floor
-    _create_tmp_rooms_file(prefix)
 
     try:
         room_finder = AvailRoomFinder(user=queryparam.user,
                                       password=queryparam.password,
                                       start_time=queryparam.starttime,
                                       duration=queryparam.duration,
-                                      filename=common.ROOMS_SEARCH_CSV,
+                                      filename=common.ROOMS_CSV,
                                       timezone=queryparam.timezone)
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees))
     except Exception as exception:
@@ -90,12 +87,6 @@ def book_room():
             return "reservation failed"
     except Exception as excpetion:
         return "reservation failed: " + str(excpetion)
-
-def _create_tmp_rooms_file(building_floor_name):
-    if 'all' in building_floor_name:
-        shutil.copyfile(common.ROOMS_CSV, common.ROOMS_SEARCH_CSV)
-    else:
-        open(common.ROOMS_SEARCH_CSV, 'w').writelines([line for line in open(common.ROOMS_CSV) if building_floor_name in line])
 
 def create_ssl_context():
     """ Create SSL context """
