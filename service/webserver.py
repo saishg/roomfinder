@@ -1,29 +1,34 @@
-import common
-import flask
+"""
+Webservice APIs for room finder backend
+"""
+
+import collections
 import json
 import os
 import socket
 
+import common
+import flask
+
 from book_room import ReserveAvailRoom
-from collections import namedtuple
 from find_available_room import AvailRoomFinder
-from shutil import copyfile
-from flask import Flask, request
 
-app = Flask(__name__, template_folder=common.TEMPLATE_FOLDER)
+APP = flask.Flask(__name__, template_folder=common.TEMPLATE_FOLDER)
 
-@app.route('/')
+@APP.route('/')
 def index():
+    """ Serve static index file """
     return flask.render_template('index.html')
 
-QueryParam = namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees, timezone' )
-BookRoomQueryParam  = namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password, timezone')
+QueryParam = collections.namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees, timezone')
+BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password, timezone')
 
-@app.route('/showbuldings', methods=['GET'])
+@APP.route('/showbuldings', methods=['GET'])
 def show_buldings():
+    """ Serve list of buildings in JSON """
     buldings = []
-    with open(common.ROOMS_CSV, 'r') as f:
-        for line in f.readlines():
+    with open(common.ROOMS_CSV, 'r') as fhandle:
+        for line in fhandle.readlines():
             buldingname = line.split('-')[0]
             if buldingname not in buldings:
                 buldings.append(buldingname)
@@ -32,45 +37,42 @@ def show_buldings():
 
 # Example Query
 # http://127.0.0.1:5000/showrooms?building_floor_name=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password
-@app.route('/showrooms', methods=['GET'])
+@APP.route('/showrooms', methods=['GET'])
 def show_rooms():
-    queryparam = QueryParam(
-                            buildingname=request.args.get('buildingname'),
-                            floor=request.args.get('floor'),
-                            starttime=request.args.get('starttime'),
-                            duration=request.args.get('duration'),
-                            user = request.args.get('user'),
-                            password = request.args.get('password'),
-                            attendees = request.args.get('attendees'),
-                            timezone = request.args.get('timezone'),
-                            )
+    """ Serve list of buildings in JSON """
+    queryparam = QueryParam(buildingname=flask.request.args.get('buildingname'),
+                            floor=flask.request.args.get('floor'),
+                            starttime=flask.request.args.get('starttime'),
+                            duration=flask.request.args.get('duration'),
+                            user=flask.request.args.get('user'),
+                            password=flask.request.args.get('password'),
+                            attendees=flask.request.args.get('attendees'),
+                            timezone=flask.request.args.get('timezone'))
 
     prefix = queryparam.buildingname + '-' + queryparam.floor
-    _create_tmp_rooms_file(prefix)
 
     try:
         room_finder = AvailRoomFinder(user=queryparam.user,
                                       password=queryparam.password,
                                       start_time=queryparam.starttime,
                                       duration=queryparam.duration,
-                                      filename=common.ROOMS_SEARCH_CSV,
+                                      filename=common.ROOMS_CSV,
                                       timezone=queryparam.timezone)
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees))
-    except Exception as e:
-        rooms_info = {"Error" : str(e)}
+    except Exception as exception:
+        rooms_info = {"Error" : str(exception)}
     return json.dumps(rooms_info)
 
-@app.route('/bookroom', methods=['GET'])
+@APP.route('/bookroom', methods=['GET'])
 def book_room():
-    queryparam = BookRoomQueryParam(
-                            roomname=request.args.get('roomname'),
-                            roomemail=request.args.get('roomemail'),
-                            starttime=request.args.get('starttime'),
-                            duration=request.args.get('duration'),
-                            user = request.args.get('user'),
-                            password = request.args.get('password'),
-                            timezone = request.args.get('timezone'),
-                            )
+    """ Reserve specified room """
+    queryparam = BookRoomQueryParam(roomname=flask.request.args.get('roomname'),
+                                    roomemail=flask.request.args.get('roomemail'),
+                                    starttime=flask.request.args.get('starttime'),
+                                    duration=flask.request.args.get('duration'),
+                                    user=flask.request.args.get('user'),
+                                    password=flask.request.args.get('password'),
+                                    timezone=flask.request.args.get('timezone'))
     room_finder = ReserveAvailRoom(user=queryparam.user,
                                    password=queryparam.password,
                                    roomname=queryparam.roomname,
@@ -83,21 +85,16 @@ def book_room():
             return "reservation requested"
         else:
             return "reservation failed"
-    except Exception as e:
-        return "reservation failed: " + str(e)
+    except Exception as excpetion:
+        return "reservation failed: " + str(excpetion)
 
-def _create_tmp_rooms_file(building_floor_name):
-    if 'all' in building_floor_name:
-        copyfile(common.ROOMS_CSV, common.ROOMS_SEARCH_CSV)
-    else:
-        open(common.ROOMS_SEARCH_CSV, 'w').writelines([ line for line in open(common.ROOMS_CSV) if building_floor_name in line])
-
-def create_context():
+def create_ssl_context():
+    """ Create SSL context """
     context = (os.path.join(common.CERT_DIR, 'roomfinder.cert'), os.path.join(common.CERT_DIR, 'roomfinder.key'))
     return context
 
 if __name__ == '__main__':
     if common.HTTPS_ENABLED:
-        app.run(threaded=True, host=socket.gethostname(), ssl_context=create_context(), port=common.HTTPS_PORT)
+        APP.run(threaded=True, host=socket.gethostname(), ssl_context=create_ssl_context(), port=common.HTTPS_PORT)
     else:
-        app.run(threaded=True, host=socket.gethostname(), port=common.HTTP_PORT)
+        APP.run(threaded=True, host=socket.gethostname(), port=common.HTTP_PORT)

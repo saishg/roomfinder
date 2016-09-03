@@ -1,20 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+APIs to query an Exchange Server for availability status of rooms
+"""
 
 import argparse
 import base64
-import common
 import csv
-import exchange_api
 import getpass
 import sys
 import threading
 import urllib
 
+import common
+from exchange_api import ExchangeApi
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+SEPARATOR = "-" * 120 + "\n"
+TABLE_FORMAT = "{0:40s} {1:64s} {2:20s}\n"
+TABLE_HEADER = SEPARATOR + TABLE_FORMAT.format("Status", "Room", "Email") + SEPARATOR
+
 class AvailRoomFinder(object):
+    """ Class to query an Exchange Server for availability status of rooms """
 
     def __init__(self, user, password,
                  start_time=common.TIME_NOW, duration='1h',
@@ -25,7 +34,7 @@ class AvailRoomFinder(object):
         self.room_info = {}
         self.timezone = timezone or common.SJ_TIME_ZONE
         self.error = None
-        self.exchange_api = exchange_api.ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
+        self.exchange_api = ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
         self.end_time = common.end_time(self.start_time, duration)
 
     def _read_room_list(self, filename):
@@ -39,6 +48,7 @@ class AvailRoomFinder(object):
         return rooms
 
     def search_free(self, prefix, min_size=1):
+        """ Look for available rooms from the list of selected rooms """
         selected_rooms = {}
         for email in self.rooms:
             name, size = self.rooms[email]
@@ -67,16 +77,18 @@ class AvailRoomFinder(object):
             room_info['name'] = room_name
             self.room_info[room_name] = room_info
 
-        except Exception as e:
-            self.error = e
-            common.LOGGER.warning("Exception querying room %s: %s", room_name, str(e))
+        except Exception as exception:
+            self.error = exception
+            common.LOGGER.warning("Exception querying room %s: %s", room_name, str(exception))
 
     def search(self, selected_rooms=None):
+        """ Lookup availability status of rooms from the list of selected rooms """
         if selected_rooms is None:
             selected_rooms = self.rooms
         worker_threads = []
 
-        common.LOGGER.info("User %s searching for a room from %s to %s", self.user, self.start_time, self.end_time)
+        common.LOGGER.info("User %s searching for a room from %s to %s",
+                           self.user, self.start_time, self.end_time)
 
         for email in selected_rooms:
             thread = threading.Thread(target=self._query, args=(email, ))
@@ -89,19 +101,19 @@ class AvailRoomFinder(object):
             if self.error is not None:
                 raise self.error # pylint: disable=E0702
 
-        LINE_SEPARATOR = "-" * 120 + "\n"
-        OUTPUT_TABLE = LINE_SEPARATOR + \
-                       "{0:40s} {1:64s} {2:20s}\n".format("Status", "Room", "Email") + \
-                       LINE_SEPARATOR
+        output_table = TABLE_HEADER
         for name, info in self.room_info.iteritems():
-            OUTPUT_TABLE += "{0:40s} {1:64s} {2:20s}\n".format(info['status'] + '-' + info['freebusy'], name, info['email'])
-        OUTPUT_TABLE += LINE_SEPARATOR
+            output_table += TABLE_FORMAT.format(
+                                info['status'] + '-' + info['freebusy'],
+                                name, info['email'])
+        output_table += SEPARATOR
 
-        common.LOGGER.debug("\n%s", OUTPUT_TABLE)
+        common.LOGGER.debug("\n%s", output_table)
 
         return self.room_info
 
 def run():
+    """ Parse command-line arguments and invoke room availability finder """
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
     parser.add_argument("-prefix", "--prefix",

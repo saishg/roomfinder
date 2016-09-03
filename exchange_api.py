@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+APIs to communicate with the Exchange Server
+"""
 
 import pipes
 import string
@@ -18,6 +21,7 @@ RESERVE_XML = None
 FIND_XML = None
 
 class ExchangeApi(object):
+    """ Class to communicate with the Exchange Server """
 
     def __init__(self, user, password):
         self.user = user
@@ -33,12 +37,16 @@ class ExchangeApi(object):
 
     def _curl(self, post_data):
         curl_command = self.command.format(post_data)
-        response = subprocess.Popen(curl_command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+        curl_process = subprocess.Popen(curl_command,
+                                        stdout=subprocess.PIPE,
+                                        shell=True)
+        response = curl_process.communicate()[0]
         if not response:
             raise Exception("Authentication failure")
         return response
 
     def room_status(self, room_email, start_time, end_time, timezone_offset):
+        """ Lookup availability status of specified room """
         global AVAILABILITY_XML
         if AVAILABILITY_XML is None:
             AVAILABILITY_XML = self._read_template("getavailibility_template.xml")
@@ -66,10 +74,11 @@ class ExchangeApi(object):
         return {'freebusy': freebusy, 'status': status, 'email' : room_email,}
 
     def reserve_room(self, room_email, room_name, start_time, end_time, timezone_offset):
+        """ Request reservation of specified room """
         global RESERVE_XML
         if RESERVE_XML is None:
             RESERVE_XML = self._read_template("reserve_resource_template.xml")
-        
+
         user_email = self.user + '@' + DOMAIN
         meeting_body = '{0} booked via RoomFinder by {1}'.format(room_name, user_email)
         subject = 'RoomFinder: {0}'.format(room_name)
@@ -82,7 +91,7 @@ class ExchangeApi(object):
                                               meeting_body=meeting_body,
                                               conf_room=room_name,
                                               timezone=timezone_offset,
-                                              ))
+                                             ))
 
         response = self._curl(data)
         return 'Success' in response
@@ -94,6 +103,7 @@ class ExchangeApi(object):
             return 0
 
     def find_rooms(self, prefix):
+        """ Search for rooms with names starting with specified prefix """
         global FIND_XML
         if FIND_XML is None:
             FIND_XML = self._read_template("resolvenames_template.xml")

@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+APIs to query an Exchange Server for list of rooms
+"""
+
 
 import argparse
-import common
 import csv
 import getpass
-import exchange_api
 import operator
 import string
 import sys
+
+import common
+import exchange_api
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 class RoomFinder(object):
+    """ Class to query an Exchange Server for list of rooms """
 
     def __init__(self, user, password, filename='rooms.csv', append=True):
         self.user = user
@@ -33,6 +39,7 @@ class RoomFinder(object):
         return self.exchange_api.find_rooms(prefix=prefix)
 
     def search(self, prefix, deep=False):
+        """ Search for rooms with names starting with specified prefix """
         rooms_found = self._search(prefix)
 
         if deep:
@@ -45,6 +52,7 @@ class RoomFinder(object):
         self.rooms.update(self._search(prefix))
 
     def dump(self):
+        """ Dump the results to specified file """
         if not len(self.rooms):
             common.LOGGER.warning("No results found, check your arguments for mistakes")
             return 0
@@ -58,6 +66,7 @@ class RoomFinder(object):
         return len(self.rooms)
 
 def run():
+    """ Parse command-line arguments and invoke room finder """
     parser = argparse.ArgumentParser()
     parser.add_argument("prefix", nargs='+', help="A prefix to search for. e.g. 'SJC19- SJC18-'")
     parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)

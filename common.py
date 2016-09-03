@@ -1,3 +1,7 @@
+"""
+Common declarations and functions
+"""
+
 import datetime
 import logging
 import os
@@ -8,7 +12,6 @@ HTTPS_PORT = 8443
 
 PWD = os.getcwd()
 ROOMS_CSV = os.path.join(PWD, 'rooms.csv')
-ROOMS_SEARCH_CSV = os.path.join(PWD, 'roomssearch.csv')
 AVAILIBILITY_TEMPLATE = os.path.join(PWD, 'getavailibility_template.xml')
 SERVICE_DIR = os.path.join(PWD, 'service')
 CERT_DIR = os.path.join(PWD, 'certdir')
@@ -26,6 +29,7 @@ logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 
 def end_time(start_time, duration):
+    """ Calculate end time, given start time and duration """
     try:
         if 'h' in duration and duration.endswith('m'):
             hours, mins = map(int, duration[:-1].split('h'))
