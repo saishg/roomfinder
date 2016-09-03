@@ -1,17 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+APIs to request an Exchange Server reserve a room
+"""
+
 import argparse
 import base64
-import common
-import exchange_api
 import getpass
 import sys
 import urllib
+
+import common
+from exchange_api import ExchangeApi
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 class ReserveAvailRoom(object):
+    """ Class to request an Exchange Server to reserve a room """
 
     def __init__(self, user, password,
                  roomname, roomemail,
@@ -24,7 +30,7 @@ class ReserveAvailRoom(object):
         self.start_time = start_time
         self.timezone = self._calc_timezone_str(timezone)
         password = raw_password or base64.b64decode(urllib.unquote(password))
-        self.exchange_api = exchange_api.ExchangeApi(user, password)
+        self.exchange_api = ExchangeApi(user, password)
         self.end_time = common.end_time(self.start_time, duration)
 
     def _calc_timezone_str(self, timezone):
@@ -38,6 +44,7 @@ class ReserveAvailRoom(object):
         return "{}PT{}H{}M".format(sign, abs(hours_offset), abs(minutes_offset))
 
     def reserve_room(self):
+        """ Request reservation of specified room """
         response = self.exchange_api.reserve_room( \
                             room_email=self.roomemail,
                             room_name=self.roomname,
@@ -47,6 +54,7 @@ class ReserveAvailRoom(object):
         return response
 
 def run():
+    """ Parse command-line arguments and request room reservation """
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
     parser.add_argument("-start", "--starttime",

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-PYTHONPATH=. gunicorn --config=CONFIG service.webserver:app
+PYTHONPATH=. gunicorn --config=CONFIG service.webserver:APP
