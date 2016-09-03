@@ -9,7 +9,8 @@ Requirements:
  - Python 2.7
  - Access to Exchange Web Service (EWS) API of a Microsoft Exchange Server 2010
 
-Before running on the command-line, edit 'exchange_api.py' and point the URL to
+Before running on the command-line, edit 'exchange_api.py' and modify your DOMAIN
+to your organization's domain e.g. 'example.com', so that the URL  points to
 your Microsoft Exchange Server, e.g. 'https://mail.example.com/ews/exchange.asmx'
 
 Command-line Usage:
@@ -84,7 +85,7 @@ Example:
 You will receive a confirmation email from Exchange if the reservation is accepted or rejected.
 
 Before starting the web-app, edit 'CONFIG' and pick the number of worker threads.
-Generate a certifcate and private key and point CONFIG to their locations.
+Generate a certificate and private key and point CONFIG to their locations.
 
 Web-App:
 
