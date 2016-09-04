@@ -49,7 +49,7 @@ class RoomFinder(object):
                 rooms_found.update(self._search(prefix_deep))
 
         common.LOGGER.info("Search for prefix '%s' yielded %d rooms.", prefix, len(rooms_found))
-        self.rooms.update(self._search(prefix))
+        self.rooms.update(rooms_found)
 
     def dump(self):
         """ Dump the results to specified file """
