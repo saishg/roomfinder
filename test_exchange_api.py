@@ -35,9 +35,9 @@ def test_room_available(mock_popen):
 
     api = exchange_api.ExchangeApi(user="testuser", password="testpassword")
     response = api.room_status(room_email=ROOM_EMAIL,
-                               start_time="2014-07-02T11:00:00",
-                               end_time="2014-07-02T11:00:00",
-                               timezone_offset="480")
+                               start_time=END_TIME,
+                               end_time=END_TIME,
+                               timezone_offset=TIME_ZONE_OFFSET)
 
     # Keys:'freebusy', 'status', 'email'
     assert response['status'] == 'Free'
@@ -53,7 +53,7 @@ def test_room_unavailable(mock_popen):
     response = api.room_status(room_email=ROOM_EMAIL,
                                start_time=START_TIME,
                                end_time=END_TIME,
-                               timezone_offset="480")
+                               timezone_offset=TIME_ZONE_OFFSET)
 
     # Keys:'freebusy', 'status', 'email'
     assert response['status'] != 'Free'
