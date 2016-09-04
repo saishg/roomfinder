@@ -100,7 +100,7 @@ class ExchangeApi(object):
         try:
             return int(roomname[roomname.find('(') + 1 : roomname.find(')')])
         except ValueError:
-            return 0
+            return 1
 
     def find_rooms(self, prefix):
         """ Search for rooms with names starting with specified prefix """
