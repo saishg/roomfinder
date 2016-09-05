@@ -1,7 +1,12 @@
+"""
+Unit Tests for exchange_api.py
+"""
+
+import string
+
 import exchange_api
 import mock
 import nose
-import string
 
 XML_KEYS = {'XML_SOAP_ENVELOPE' : 'http://schemas.xmlsoap.org/soap/envelope/',
             'XML_SCHEMA' : 'http://schemas.microsoft.com/exchange/services/2006',
@@ -41,11 +46,11 @@ def get_popen_mock_find_rooms(mock_popen, room_info):
 
 @mock.patch('exchange_api.subprocess.Popen')
 def test_find_rooms(mock_popen):
-    ROOM1 = ROOM_INFO_XML.substitute(room_name='ROOM1')
-    ROOM2 = ROOM_INFO_XML.substitute(room_name='ROOM2')
-    ROOM3 = ROOM_INFO_XML.substitute(room_name='ROOM3')
+    room1 = ROOM_INFO_XML.substitute(room_name='ROOM1')
+    room2 = ROOM_INFO_XML.substitute(room_name='ROOM2')
+    room3 = ROOM_INFO_XML.substitute(room_name='ROOM3')
 
-    get_popen_mock_find_rooms(mock_popen, room_info=[ROOM1, ROOM2, ROOM3])
+    get_popen_mock_find_rooms(mock_popen, room_info=[room1, room2, room3])
     api = exchange_api.ExchangeApi(user="testuser", password="testpassword")
     response = api.find_rooms(prefix="ROOM")
     assert len(response) == 3
@@ -62,8 +67,8 @@ def get_popen_mock_room_avail(mock_popen, freebusy):
 
 @mock.patch('exchange_api.subprocess.Popen')
 def test_room_available(mock_popen):
-    FREEBUSY = '0000'
-    get_popen_mock_room_avail(mock_popen, FREEBUSY)
+    freebusy = '0000'
+    get_popen_mock_room_avail(mock_popen, freebusy=freebusy)
 
     api = exchange_api.ExchangeApi(user="testuser", password="testpassword")
     response = api.room_status(room_email=ROOM_EMAIL,
@@ -73,13 +78,13 @@ def test_room_available(mock_popen):
 
     # Keys:'freebusy', 'status', 'email'
     assert response['status'] == 'Free'
-    assert response['freebusy'] == FREEBUSY
+    assert response['freebusy'] == freebusy
     assert response['email'] == ROOM_EMAIL
 
 @mock.patch('exchange_api.subprocess.Popen')
 def test_room_unavailable(mock_popen):
-    FREEBUSY = '0022'
-    get_popen_mock_room_avail(mock_popen, FREEBUSY)
+    freebusy = '0022'
+    get_popen_mock_room_avail(mock_popen, freebusy=freebusy)
 
     api = exchange_api.ExchangeApi(user="testuser", password="testpassword")
     response = api.room_status(room_email=ROOM_EMAIL,
@@ -89,7 +94,7 @@ def test_room_unavailable(mock_popen):
 
     # Keys:'freebusy', 'status', 'email'
     assert response['status'] != 'Free'
-    assert response['freebusy'] == FREEBUSY
+    assert response['freebusy'] == freebusy
     assert response['email'] == ROOM_EMAIL
 
 def get_popen_mock_room_reserve(mock_popen, result):
@@ -100,8 +105,8 @@ def get_popen_mock_room_reserve(mock_popen, result):
 
 @mock.patch('exchange_api.subprocess.Popen')
 def test_room_reserve_success(mock_popen):
-    RESULT = 'Success'
-    get_popen_mock_room_reserve(mock_popen, RESULT)
+    result = 'Success'
+    get_popen_mock_room_reserve(mock_popen, result)
 
     api = exchange_api.ExchangeApi(user="testuser", password="testpassword")
     response = api.reserve_room(room_email=ROOM_EMAIL,
@@ -114,8 +119,8 @@ def test_room_reserve_success(mock_popen):
 
 @mock.patch('exchange_api.subprocess.Popen')
 def test_room_reserve_failure(mock_popen):
-    RESULT = 'Failure'
-    get_popen_mock_room_reserve(mock_popen, RESULT)
+    result = 'Failure'
+    get_popen_mock_room_reserve(mock_popen, result)
 
     api = exchange_api.ExchangeApi(user="testuser", password="testpassword")
     response = api.reserve_room(room_email=ROOM_EMAIL,
@@ -125,6 +130,3 @@ def test_room_reserve_failure(mock_popen):
                                 timezone_offset=TIME_ZONE_OFFSET)
 
     assert response is False
-
-
-
