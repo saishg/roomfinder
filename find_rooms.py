@@ -6,9 +6,7 @@ APIs to query an Exchange Server for list of rooms
 
 
 import argparse
-import csv
 import getpass
-import operator
 import string
 import sys
 
@@ -27,13 +25,7 @@ class RoomFinder(object):
         self.exchange_api = exchange_api.ExchangeApi(self.user, password)
         self.rooms = {}
         if append:
-            self._load()
-
-    def _load(self):
-        with open(self.filename, 'r') as fhandle:
-            reader = csv.reader(fhandle)
-            for row in reader:
-                self.rooms[row[1]] = row[0], int(row[2])
+            common.read_room_list(self.filename)
 
     def _search(self, prefix):
         return self.exchange_api.find_rooms(prefix=prefix)
@@ -57,12 +49,7 @@ class RoomFinder(object):
             common.LOGGER.warning("No results found, check your arguments for mistakes")
             return 0
 
-        with open(self.filename, "wb") as fhandle:
-            writer = csv.writer(fhandle)
-            for email, room_info in sorted(self.rooms.iteritems(), key=operator.itemgetter(1)):
-                name, size = room_info
-                writer.writerow([name, email, size])
-
+        common.write_room_list(self.filename, self.rooms)
         return len(self.rooms)
 
 def run():
