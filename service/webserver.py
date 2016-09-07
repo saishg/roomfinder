@@ -26,27 +26,15 @@ BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, roomemail, 
 @APP.route('/showbuldings', methods=['GET'])
 def show_buldings():
     """ Serve list of buildings in JSON """
-    buldings = set()
-    with open(common.ROOMS_CSV, 'r') as fhandle:
-        for line in fhandle.readlines():
-            buldingname = line.split('-')[0]
-            buldings.add(buldingname)
-    return json.dumps(sorted(buldings))
+    buildings = common.get_building_list()
+    return json.dumps(buildings)
 
 @APP.route('/showfloors', methods=['GET'])
 def show_floors():
     """ Serve list of buildings in JSON """
-    floors = set()
-    with open(common.ROOMS_CSV, 'r') as fhandle:
-        for line in fhandle.readlines():
-            buildingname = flask.request.args.get('buildingname')
-            if line.startswith(buildingname):
-                floors.add(line.split('-')[1])
-
-    if len(floors) > 1:
-        return json.dumps(sorted(floors) + ["Any"])
-    else:
-        return json.dumps(list(floors))
+    buildingname = flask.request.args.get('buildingname')
+    floors = common.get_floor_list(buildingname)
+    return json.dumps(floors + ["Any"])
 
 # Example Query
 # http://127.0.0.1:5000/showrooms?building_floor_name=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password

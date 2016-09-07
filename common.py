@@ -18,6 +18,11 @@ SERVICE_DIR = os.path.join(PWD, 'service')
 CERT_DIR = os.path.join(PWD, 'certdir')
 TEMPLATE_FOLDER = os.path.join(SERVICE_DIR, 'templates')
 
+ROOMS_CACHE = None
+ROOMNAMES_CACHE = None
+BUILDINGS_CACHE = None
+FLOORS_CACHE = {}
+
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
 SJ_TIME_ZONE = "420"
 
@@ -51,6 +56,10 @@ def end_time(start_time, duration):
     return (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
 
 def read_room_list(filename=ROOMS_CSV):
+    global ROOMS_CACHE
+
+    if ROOMS_CACHE is not None:
+        return ROOMS_CACHE
     rooms = {}
 
     try:
@@ -61,9 +70,55 @@ def read_room_list(filename=ROOMS_CSV):
     except IOError as exception:
         LOGGER.warning("Error opening %s: %s", filename, str(exception))
 
+    ROOMS_CACHE = rooms
     return rooms
 
-def write_room_list(filename, rooms):
+def get_roomname_list(filename=ROOMS_CSV):
+    global ROOMNAMES_CACHE
+
+    if ROOMNAMES_CACHE is not None:
+        return ROOMNAMES_CACHE
+
+    rooms = read_room_list(filename=filename)
+    roomnames = []
+
+    for roominfo in rooms.values():
+        roomnames.append(roominfo[0])
+
+    ROOMNAMES_CACHE = sorted(roomnames)
+    return ROOMNAMES_CACHE
+
+def get_building_list(filename=ROOMS_CSV):
+    global BUILDINGS_CACHE
+
+    if BUILDINGS_CACHE is not None:
+        return BUILDINGS_CACHE
+
+    roomnames = get_roomname_list(filename=filename)
+    buildings = set()
+    for roomname in roomnames:
+        buildings.add(roomname.split('-')[0])
+
+    BUILDINGS_CACHE = sorted(buildings)
+    return BUILDINGS_CACHE
+
+def get_floor_list(buildingname, filename=ROOMS_CSV):
+    if buildingname in FLOORS_CACHE:
+        return FLOORS_CACHE[buildingname]
+
+    roomnames = get_roomname_list(filename=filename)
+    floors = set()
+    for roomname in roomnames:
+        if roomname.startswith(buildingname):
+            floors.add(roomname.split('-')[1])
+
+    FLOORS_CACHE[buildingname] = sorted(floors)
+    return FLOORS_CACHE[buildingname]
+
+def write_room_list(rooms, filename=ROOMS_CSV):
+    global ROOMS_CACHE
+    ROOMS_CACHE = rooms
+
     with open(filename, "wb") as fhandle:
         writer = csv.writer(fhandle)
         for email, room_info in sorted(rooms.iteritems(), key=operator.itemgetter(1)):

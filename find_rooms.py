@@ -49,7 +49,7 @@ class RoomFinder(object):
             common.LOGGER.warning("No results found, check your arguments for mistakes")
             return 0
 
-        common.write_room_list(self.filename, self.rooms)
+        common.write_room_list(self.rooms, filename=self.filename)
         return len(self.rooms)
 
 def run():
