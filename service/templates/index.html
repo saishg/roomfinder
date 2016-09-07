@@ -93,7 +93,7 @@
         <fieldset>
             <label id="userLabel">CEC User ID</label> <label id="passwordLabel">Password</label><br/>
             <input type="text" id="userNameInput"></input> <input type="password" id="passwordInput"></input><br/>
-        <label id="buildingLabel">Building</label> <select id="buildingSelect"></select>
+        <label id="buildingLabel">Building</label> <select id="buildingSelect" onchange="loadFloorList(this.value)"></select>
         <label id="floorLabel">Floor</label> <select id="floorSelect"></select>
         <label id="roomSizeLabel">Attendees</label> <select id="roomSizeSelect"></select><br/>
         <label id="dateLabel">Date</label><br/> <input type="date" id="bookDate"/><br/>

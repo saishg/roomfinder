@@ -43,6 +43,7 @@ function init(){
 
 function createCombo(container, data) {
     var options = '';
+    container.options.length = 0;
     for (var i = 0; i < data.length; i++) {
         container.options.add(new Option(data[i], data[i]));
     }
@@ -50,10 +51,21 @@ function createCombo(container, data) {
 
 function loadBuildingNamesList() {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", "/showbuldings", false ); // false for synchronous request
-    xmlHttp.send( null );
+    xmlHttp.open("GET", "/showbuldings", false);
+    xmlHttp.send(null);
     buildings = JSON.parse(xmlHttp.responseText);
 }
+
+function loadFloorList(buildingname) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "/showfloors?buildingname=" + buildingname, false);
+    xmlHttp.send(null);
+    floors = JSON.parse(xmlHttp.responseText);
+    createCombo(floorSelect, floors);
+}
+
+//Example: http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
+
 
 //Example: http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
 
@@ -62,7 +74,7 @@ function submitClickHandler() {
     var rowCount = mytable.rows.length;
     for (var i = tableHeaderRowCount; i < rowCount; i++) {
         mytable.deleteRow(tableHeaderRowCount);
-        console.log("clearing row number:"+i);
+        console.log("clearing row number:" + i);
     }
     mytable.innerHTML = "";
     mytable.visiblity = false;
