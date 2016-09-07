@@ -117,6 +117,8 @@ class ExchangeApi(object):
         for elem in elems:
             email = elem.findall(SCHEME_TYPES + "EmailAddress")
             name = elem.findall(SCHEME_TYPES + "DisplayName")
+            city = elem.findall(SCHEME_TYPES + "City")
+            country = elem.findall(SCHEME_TYPES + "CountryOrRegion")
             if len(email) and len(name):
                 roomsize = self._parse_room_size(name[0].text)
                 if roomsize:
