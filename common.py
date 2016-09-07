@@ -4,7 +4,6 @@ Common declarations and functions
 import csv
 import datetime
 import logging
-import operator
 import os
 
 HTTPS_ENABLED = True
@@ -90,8 +89,6 @@ def get_roomname_list(filename=ROOMS_CSV):
     return ROOMNAMES_CACHE
 
 def get_building_list(city, filename=ROOMS_CSV):
-    global BUILDINGS_CACHE
-
     if city in BUILDINGS_CACHE:
         return BUILDINGS_CACHE[city]
 
