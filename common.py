@@ -20,7 +20,8 @@ TEMPLATE_FOLDER = os.path.join(SERVICE_DIR, 'templates')
 
 ROOMS_CACHE = None
 ROOMNAMES_CACHE = None
-BUILDINGS_CACHE = None
+CITIES_CACHE = None
+BUILDINGS_CACHE = {}
 FLOORS_CACHE = {}
 
 TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
@@ -88,19 +89,20 @@ def get_roomname_list(filename=ROOMS_CSV):
     ROOMNAMES_CACHE = sorted(rooms)
     return ROOMNAMES_CACHE
 
-def get_building_list(filename=ROOMS_CSV):
+def get_building_list(city, filename=ROOMS_CSV):
     global BUILDINGS_CACHE
 
-    if BUILDINGS_CACHE is not None:
-        return BUILDINGS_CACHE
+    if city in BUILDINGS_CACHE:
+        return BUILDINGS_CACHE[city]
 
-    roomnames = get_roomname_list(filename=filename)
+    rooms = read_room_list(filename=filename)
     buildings = set()
-    for roomname in roomnames:
-        buildings.add(roomname.split('-')[0])
+    for roomname, roominfo in rooms.iteritems():
+        if roominfo["city"] == city:
+            buildings.add(roomname.split('-')[0])
 
-    BUILDINGS_CACHE = sorted(buildings)
-    return BUILDINGS_CACHE
+    BUILDINGS_CACHE[city] = sorted(buildings)
+    return BUILDINGS_CACHE[city]
 
 def get_floor_list(buildingname, filename=ROOMS_CSV):
     if buildingname in FLOORS_CACHE:
@@ -114,6 +116,20 @@ def get_floor_list(buildingname, filename=ROOMS_CSV):
 
     FLOORS_CACHE[buildingname] = sorted(floors)
     return FLOORS_CACHE[buildingname]
+
+def get_city_list(filename=ROOMS_CSV):
+    global CITIES_CACHE
+
+    if CITIES_CACHE is not None:
+        return CITIES_CACHE
+
+    rooms = read_room_list(filename=filename)
+    cities = set()
+    for roominfo in rooms.itervalues():
+        cities.add(roominfo["city"])
+
+    CITIES_CACHE = sorted(cities)
+    return CITIES_CACHE
 
 def write_room_list(rooms, filename=ROOMS_CSV):
     global ROOMS_CACHE
