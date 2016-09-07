@@ -26,7 +26,7 @@ class AvailRoomFinder(object):
 
     def __init__(self, user, password,
                  start_time=common.TIME_NOW, duration='1h',
-                 filename='rooms.csv', timezone=common.SJ_TIME_ZONE):
+                 filename=common.ROOMS_CSV, timezone=common.SJ_TIME_ZONE):
         self.rooms = common.read_room_list(filename)
         self.user = user
         self.start_time = start_time
@@ -115,8 +115,8 @@ def run():
                         help="Duration e.g. 1h or 15m (default = 1h)",
                         default='1h')
     parser.add_argument("-f", "--file",
-                        help="csv filename with room info (default=rooms.csv).",
-                        default="rooms.csv")
+                        help="csv filename with room info (default={}).".format(common.ROOMS_CSV),
+                        default=common.ROOMS_CSV)
 
     args = parser.parse_args()
     args.password = base64.b64encode(getpass.getpass("Password:"))
