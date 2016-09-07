@@ -65,8 +65,13 @@ def read_room_list(filename=ROOMS_CSV):
     try:
         with open(filename, 'r') as fhandle:
             reader = csv.reader(fhandle)
-            for room_name, room_email, room_size in reader:
-                rooms[room_email] = room_name, int(room_size)
+            for room_name, room_email, room_size, city, country in reader:
+                rooms[room_name] = {"name" : room_name,
+                                    "size" : int(room_size),
+                                    "email" : room_email,
+                                    "city" : city,
+                                    "country" : country,
+                                   }
     except IOError as exception:
         LOGGER.warning("Error opening %s: %s", filename, str(exception))
 
@@ -80,12 +85,7 @@ def get_roomname_list(filename=ROOMS_CSV):
         return ROOMNAMES_CACHE
 
     rooms = read_room_list(filename=filename)
-    roomnames = []
-
-    for roominfo in rooms.values():
-        roomnames.append(roominfo[0])
-
-    ROOMNAMES_CACHE = sorted(roomnames)
+    ROOMNAMES_CACHE = sorted(rooms)
     return ROOMNAMES_CACHE
 
 def get_building_list(filename=ROOMS_CSV):
@@ -121,6 +121,10 @@ def write_room_list(rooms, filename=ROOMS_CSV):
 
     with open(filename, "wb") as fhandle:
         writer = csv.writer(fhandle)
-        for email, room_info in sorted(rooms.iteritems(), key=operator.itemgetter(1)):
-            name, size = room_info
-            writer.writerow([name, email, size])
+        for name in sorted(rooms):
+            room_info = rooms[name]
+            email = room_info["email"]
+            size = room_info["size"]
+            city = room_info["city"]
+            country = room_info["country"]
+            writer.writerow([name, email, size, city, country])
