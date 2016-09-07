@@ -25,7 +25,7 @@ class RoomFinder(object):
         self.exchange_api = exchange_api.ExchangeApi(self.user, password)
         self.rooms = {}
         if append:
-            common.read_room_list(self.filename)
+            self.rooms = common.read_room_list(self.filename)
 
     def _search(self, prefix):
         return self.exchange_api.find_rooms(prefix=prefix)
