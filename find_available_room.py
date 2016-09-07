@@ -6,7 +6,6 @@ APIs to query an Exchange Server for availability status of rooms
 
 import argparse
 import base64
-import csv
 import getpass
 import sys
 import threading
@@ -27,8 +26,8 @@ class AvailRoomFinder(object):
 
     def __init__(self, user, password,
                  start_time=common.TIME_NOW, duration='1h',
-                 filename='rooms.csv', timezone=common.SJ_TIME_ZONE):
-        self.rooms = self._read_room_list(filename)
+                 filename=common.ROOMS_CSV, timezone=common.SJ_TIME_ZONE):
+        self.rooms = common.read_room_list(filename)
         self.user = user
         self.start_time = start_time
         self.room_info = {}
@@ -36,16 +35,6 @@ class AvailRoomFinder(object):
         self.error = None
         self.exchange_api = ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
         self.end_time = common.end_time(self.start_time, duration)
-
-    def _read_room_list(self, filename):
-        rooms = {}
-
-        with open(filename, 'r') as fhandle:
-            reader = csv.reader(fhandle)
-            for row in reader:
-                rooms[unicode(row[1])] = (unicode(row[0]), int(row[2]))
-
-        return rooms
 
     def search_free(self, prefix, min_size=1):
         """ Look for available rooms from the list of selected rooms """
@@ -126,8 +115,8 @@ def run():
                         help="Duration e.g. 1h or 15m (default = 1h)",
                         default='1h')
     parser.add_argument("-f", "--file",
-                        help="csv filename with room info (default=rooms.csv).",
-                        default="rooms.csv")
+                        help="csv filename with room info (default={}).".format(common.ROOMS_CSV),
+                        default=common.ROOMS_CSV)
 
     args = parser.parse_args()
     args.password = base64.b64encode(getpass.getpass("Password:"))

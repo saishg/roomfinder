@@ -1,9 +1,10 @@
 """
 Common declarations and functions
 """
-
+import csv
 import datetime
 import logging
+import operator
 import os
 
 HTTPS_ENABLED = True
@@ -48,3 +49,23 @@ def end_time(start_time, duration):
 
     start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
     return (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
+
+def read_room_list(filename=ROOMS_CSV):
+    rooms = {}
+
+    try:
+        with open(filename, 'r') as fhandle:
+            reader = csv.reader(fhandle)
+            for room_name, room_email, room_size in reader:
+                rooms[room_email] = room_name, int(room_size)
+    except IOError as exception:
+        LOGGER.warning("Error opening %s: %s", filename, str(exception))
+
+    return rooms
+
+def write_room_list(filename, rooms):
+    with open(filename, "wb") as fhandle:
+        writer = csv.writer(fhandle)
+        for email, room_info in sorted(rooms.iteritems(), key=operator.itemgetter(1)):
+            name, size = room_info
+            writer.writerow([name, email, size])

@@ -1,5 +1,5 @@
 var buildings = []
-var floors = ["1", "2", "3", "4", "5"];
+var floors = ["1", "2", "3", "4", "5", "Any"];
 var times_hours = ["00", "01", "02","03",
                    "4", "05", "06", "07",
                    "08", "09", "10", "11",
@@ -10,7 +10,7 @@ var times_mins = ["00", "15", "30","45"];
 var duration_hours = ["0h", "1h", "2h","3h",
                       "4h", "5h", "6h", "7h"];
 var duration_mins = ["00m", "15m", "30m","45m"];
-var sizes = ["1", "2", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "23", "24", "25", "30", "36", "50", "60", "65", "68", "70", "100", "120", "410"]
+var sizes = ["1", "2", "4", "5", "6", "7", "8", "9", "10", "15", "20", "25", "30", "50", "70", "100"];
 var date_years = ["2016", "2017"];
 var date_months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 var date_days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
@@ -43,6 +43,7 @@ function init(){
 
 function createCombo(container, data) {
     var options = '';
+    container.options.length = 0;
     for (var i = 0; i < data.length; i++) {
         container.options.add(new Option(data[i], data[i]));
     }
@@ -50,10 +51,21 @@ function createCombo(container, data) {
 
 function loadBuildingNamesList() {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", "/showbuldings", false ); // false for synchronous request
-    xmlHttp.send( null );
+    xmlHttp.open("GET", "/showbuldings", false);
+    xmlHttp.send(null);
     buildings = JSON.parse(xmlHttp.responseText);
 }
+
+function loadFloorList(buildingname) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "/showfloors?buildingname=" + buildingname, false);
+    xmlHttp.send(null);
+    floors = JSON.parse(xmlHttp.responseText);
+    createCombo(floorSelect, floors);
+}
+
+//Example: http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
+
 
 //Example: http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****
 
@@ -62,7 +74,7 @@ function submitClickHandler() {
     var rowCount = mytable.rows.length;
     for (var i = tableHeaderRowCount; i < rowCount; i++) {
         mytable.deleteRow(tableHeaderRowCount);
-        console.log("clearing row number:"+i);
+        console.log("clearing row number:" + i);
     }
     mytable.innerHTML = "";
     mytable.visiblity = false;

@@ -26,14 +26,27 @@ BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, roomemail, 
 @APP.route('/showbuldings', methods=['GET'])
 def show_buldings():
     """ Serve list of buildings in JSON """
-    buldings = []
+    buldings = set()
     with open(common.ROOMS_CSV, 'r') as fhandle:
         for line in fhandle.readlines():
             buldingname = line.split('-')[0]
-            if buldingname not in buldings:
-                buldings.append(buldingname)
-    return json.dumps(buldings)
+            buldings.add(buldingname)
+    return json.dumps(sorted(buldings))
 
+@APP.route('/showfloors', methods=['GET'])
+def show_floors():
+    """ Serve list of buildings in JSON """
+    floors = set()
+    with open(common.ROOMS_CSV, 'r') as fhandle:
+        for line in fhandle.readlines():
+            buildingname = flask.request.args.get('buildingname')
+            if line.startswith(buildingname):
+                floors.add(line.split('-')[1])
+
+    if len(floors) > 1:
+        return json.dumps(sorted(floors) + ["Any"])
+    else:
+        return json.dumps(list(floors))
 
 # Example Query
 # http://127.0.0.1:5000/showrooms?building_floor_name=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password
@@ -49,14 +62,16 @@ def show_rooms():
                             attendees=flask.request.args.get('attendees'),
                             timezone=flask.request.args.get('timezone'))
 
-    prefix = queryparam.buildingname + '-' + queryparam.floor
+    if queryparam.floor.startswith("Any"):
+        prefix = queryparam.buildingname
+    else:
+        prefix = queryparam.buildingname + '-' + queryparam.floor
 
     try:
         room_finder = AvailRoomFinder(user=queryparam.user,
                                       password=queryparam.password,
                                       start_time=queryparam.starttime,
                                       duration=queryparam.duration,
-                                      filename=common.ROOMS_CSV,
                                       timezone=queryparam.timezone)
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees))
     except Exception as exception:
