@@ -103,10 +103,10 @@ class ExchangeApi(object):
             return 1
 
     def _polish(self, elem_list):
-        if len(elem_list) > 0 and elem_list[0] is not None:
-            return elem_list[0].text
-        else:
+        if len(elem_list) == 0 or elem_list[0] is None or elem_list[0].text is None:
             return ""
+        else:
+            return elem_list[0].text
             
 
     def find_rooms(self, prefix):
@@ -126,7 +126,7 @@ class ExchangeApi(object):
             name = self._polish(elem.findall(SCHEME_TYPES + "DisplayName"))
             city = self._polish(elem.findall(SCHEME_TYPES + "City"))
             country = self._polish(elem.findall(SCHEME_TYPES + "CountryOrRegion"))
-            if len(name) > 0 and len(email) > 0:
+            if len(name) > 0 and len(email) > 0 and len(city) > 0:
                 roomsize = self._parse_room_size(name)
                 if roomsize:
                     room_info[name] = {"name" : name,
