@@ -1,4 +1,5 @@
 var buildings = []
+var cities = []
 var floors = ["1", "2", "3", "4", "5", "Any"];
 var times_hours = ["00", "01", "02","03",
                    "4", "05", "06", "07",
@@ -19,16 +20,21 @@ var date_days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
                  "31"];
 
 function init(){
-    loadBuildingNamesList();
+    loadCitiesList();
     createCombo(buildingSelect, buildings);
+    createCombo(citySelect, cities);
     createCombo(floorSelect, floors);
     createCombo(roomSizeSelect, sizes);
     createCombo(startTimeHourSelect, times_hours);
     createCombo(startTimeMinSelect, times_mins);
     createCombo(durationHourSelect, duration_hours);
     createCombo(durationMinSelect, duration_mins);
+
+    citySelect.value = "San Jose";
+    loadBuildingList(citySelect.value);
     buildingSelect.value = "SJC19";
-    floorSelect.value="3";
+    loadFloorList(buildingSelect.value);
+    floorSelect.value = "3";
     durationMinSelect.value = "30m";
 
     var date = new Date();
@@ -49,11 +55,11 @@ function createCombo(container, data) {
     }
 }
 
-function loadBuildingNamesList() {
+function loadCitiesList() {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", "/showbuldings", false);
+    xmlHttp.open("GET", "/showcities", false);
     xmlHttp.send(null);
-    buildings = JSON.parse(xmlHttp.responseText);
+    cities = JSON.parse(xmlHttp.responseText);
 }
 
 function loadFloorList(buildingname) {
@@ -62,6 +68,14 @@ function loadFloorList(buildingname) {
     xmlHttp.send(null);
     floors = JSON.parse(xmlHttp.responseText);
     createCombo(floorSelect, floors);
+}
+
+function loadBuildingList(city) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "/showbuildings?city=" + city, false);
+    xmlHttp.send(null);
+    buildings = JSON.parse(xmlHttp.responseText);
+    createCombo(buildingSelect, buildings);
 }
 
 //Example: http://127.0.0.1:5000/showrooms?roomname=SJC19-3&starttime=2016-08-25T09:00:00&endtime=2016-08-25T19:00:00&user=mrathor&password=****

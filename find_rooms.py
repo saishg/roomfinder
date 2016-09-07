@@ -25,7 +25,7 @@ class RoomFinder(object):
         self.exchange_api = exchange_api.ExchangeApi(self.user, password)
         self.rooms = {}
         if append:
-            common.read_room_list(self.filename)
+            self.rooms = common.read_room_list(self.filename)
 
     def _search(self, prefix):
         return self.exchange_api.find_rooms(prefix=prefix)
@@ -49,7 +49,7 @@ class RoomFinder(object):
             common.LOGGER.warning("No results found, check your arguments for mistakes")
             return 0
 
-        common.write_room_list(self.filename, self.rooms)
+        common.write_room_list(self.rooms, filename=self.filename)
         return len(self.rooms)
 
 def run():

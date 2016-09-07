@@ -102,6 +102,13 @@ class ExchangeApi(object):
         except ValueError:
             return 1
 
+    def _polish(self, elem_list):
+        if len(elem_list) == 0 or elem_list[0] is None or elem_list[0].text is None:
+            return ""
+        else:
+            return elem_list[0].text
+            
+
     def find_rooms(self, prefix):
         """ Search for rooms with names starting with specified prefix """
         global FIND_XML
@@ -115,10 +122,17 @@ class ExchangeApi(object):
         tree = ET.fromstring(response)
         elems = tree.findall(SCHEME_TYPES + "Resolution")
         for elem in elems:
-            email = elem.findall(SCHEME_TYPES + "EmailAddress")
-            name = elem.findall(SCHEME_TYPES + "DisplayName")
-            if len(email) and len(name):
-                roomsize = self._parse_room_size(name[0].text)
+            email = self._polish(elem.findall(SCHEME_TYPES + "EmailAddress"))
+            name = self._polish(elem.findall(SCHEME_TYPES + "DisplayName"))
+            city = self._polish(elem.findall(SCHEME_TYPES + "City"))
+            country = self._polish(elem.findall(SCHEME_TYPES + "CountryOrRegion"))
+            if len(name) > 0 and len(email) > 0 and len(city) > 0:
+                roomsize = self._parse_room_size(name)
                 if roomsize:
-                    room_info[email[0].text] = (name[0].text, roomsize)
+                    room_info[name] = {"name" : name,
+                                       "size" : roomsize,
+                                       "email" : email,
+                                       "city" : city.title(),
+                                       "country" : country.title(),
+                                      }
         return room_info

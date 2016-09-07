@@ -23,36 +23,34 @@ def index():
 QueryParam = collections.namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees, timezone')
 BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password, timezone')
 
-@APP.route('/showbuldings', methods=['GET'])
+@APP.route('/showcities', methods=['GET'])
+def show_cities():
+    """ Serve list of cities in JSON """
+    cities = common.get_city_list()
+    return json.dumps(cities)
+
+@APP.route('/showbuildings', methods=['GET'])
 def show_buldings():
     """ Serve list of buildings in JSON """
-    buldings = set()
-    with open(common.ROOMS_CSV, 'r') as fhandle:
-        for line in fhandle.readlines():
-            buldingname = line.split('-')[0]
-            buldings.add(buldingname)
-    return json.dumps(sorted(buldings))
+    city = flask.request.args.get('city')
+    buildings = common.get_building_list(city)
+    return json.dumps(buildings)
 
 @APP.route('/showfloors', methods=['GET'])
 def show_floors():
-    """ Serve list of buildings in JSON """
-    floors = set()
-    with open(common.ROOMS_CSV, 'r') as fhandle:
-        for line in fhandle.readlines():
-            buildingname = flask.request.args.get('buildingname')
-            if line.startswith(buildingname):
-                floors.add(line.split('-')[1])
-
+    """ Serve list of floors in JSON """
+    buildingname = flask.request.args.get('buildingname')
+    floors = common.get_floor_list(buildingname)
     if len(floors) > 1:
-        return json.dumps(sorted(floors) + ["Any"])
+        return json.dumps(floors + ["Any"])
     else:
-        return json.dumps(list(floors))
+        return json.dumps(floors)
 
 # Example Query
 # http://127.0.0.1:5000/showrooms?building_floor_name=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password
 @APP.route('/showrooms', methods=['GET'])
 def show_rooms():
-    """ Serve list of buildings in JSON """
+    """ Serve list of rooms in JSON """
     queryparam = QueryParam(buildingname=flask.request.args.get('buildingname'),
                             floor=flask.request.args.get('floor'),
                             starttime=flask.request.args.get('starttime'),

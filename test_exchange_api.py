@@ -13,7 +13,7 @@ XML_KEYS = {'XML_SOAP_ENVELOPE' : 'http://schemas.xmlsoap.org/soap/envelope/',
             'XML_W3_SCHEMA' : 'http://www.w3.org/2001/XMLSchema',
            }
 
-ROOM_INFO_XML = string.Template('<t:Resolution><t:Mailbox><t:Name>$room_name</t:Name><t:EmailAddress>$room_name@example.com</t:EmailAddress><t:RoutingType>SMTP</t:RoutingType><t:MailboxType>Mailbox</t:MailboxType></t:Mailbox><t:Contact><t:DisplayName>$room_name (12)</t:DisplayName><t:GivenName>ROOM</t:GivenName><t:Initials/><t:CompanyName/><t:EmailAddresses/><t:PhysicalAddresses/><t:PhoneNumbers/><t:AssistantName/><t:ContactSource>ActiveDirectory</t:ContactSource><t:Department/><t:JobTitle/><t:OfficeLocation/><t:Surname>$room_name</t:Surname></t:Contact></t:Resolution>')
+ROOM_INFO_XML = string.Template('<t:Resolution><t:Mailbox><t:Name>$room_name</t:Name><t:EmailAddress>$room_name@example.com</t:EmailAddress><t:RoutingType>SMTP</t:RoutingType><t:MailboxType>Mailbox</t:MailboxType></t:Mailbox><t:Contact><t:DisplayName>$room_name (12)</t:DisplayName><t:GivenName>ROOM</t:GivenName><t:Initials/><t:CompanyName/><t:EmailAddresses/><t:PhysicalAddresses><t:Entry Key="Business"><t:Street>0 Street St.</t:Street><t:City>Los Gatos</t:City><t:State>California</t:State><t:CountryOrRegion>United States</t:CountryOrRegion><t:PostalCode/></t:Entry></t:PhysicalAddresses><t:PhoneNumbers/><t:AssistantName/><t:ContactSource>ActiveDirectory</t:ContactSource><t:Department/><t:JobTitle/><t:OfficeLocation/><t:Surname>$room_name</t:Surname></t:Contact></t:Resolution>')
 
 FIND_ROOMS_XML = string.Template('<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="{XML_SOAP_ENVELOPE}"><s:Header><h:ServerVersionInfo xmlns:h="{XML_SCHEMA}/types" xmlns="{XML_SCHEMA}/types" xmlns:xsd="{XML_W3_SCHEMA}" xmlns:xsi="{XML_W3_SCHEMA}-instance" MajorVersion="15" MinorVersion="0" MajorBuildNumber="1210" MinorBuildNumber="2"/></s:Header><s:Body xmlns:xsi="{XML_W3_SCHEMA}-instance" xmlns:xsd="{XML_W3_SCHEMA}"><m:ResolveNamesResponse xmlns:m="{XML_SCHEMA}/messages" xmlns:t="{XML_SCHEMA}/types"><m:ResponseMessages><m:ResolveNamesResponseMessage ResponseClass="Warning"><m:MessageText>Multiple results were found.</m:MessageText><m:ResponseCode>ErrorNameResolutionMultipleResults</m:ResponseCode><m:DescriptiveLinkKey>0</m:DescriptiveLinkKey><m:ResolutionSet TotalItemsInView="$num_rooms" IncludesLastItemInRange="true">$room_info</m:ResolutionSet></m:ResolveNamesResponseMessage></m:ResponseMessages></m:ResolveNamesResponse></s:Body></s:Envelope>'.format(**XML_KEYS))
 
@@ -54,10 +54,6 @@ def test_find_rooms(mock_popen):
     api = exchange_api.ExchangeApi(user="testuser", password="testpassword")
     response = api.find_rooms(prefix="ROOM")
     assert len(response) == 3
-    assert response.get('ROOM1@example.com')
-    assert response.get('ROOM2@example.com')
-    assert response.get('ROOM3@example.com')
-    assert response.get('ROOM4@example.com') is None
 
 def get_popen_mock_room_avail(mock_popen, freebusy):
     process_mock = mock.Mock()

@@ -39,21 +39,22 @@ class AvailRoomFinder(object):
     def search_free(self, prefix, min_size=1):
         """ Look for available rooms from the list of selected rooms """
         selected_rooms = {}
-        for email in self.rooms:
-            name, size = self.rooms[email]
-            if name.startswith(prefix) and size >= min_size:
-                selected_rooms[email] = (name, size)
+        for roomname, room_info in self.rooms.iteritems():
+            size = room_info["size"]
+            if roomname.startswith(prefix) and size >= min_size:
+                selected_rooms[roomname] = room_info
 
         selected_room_info = self.search(selected_rooms)
         free_room_info = {}
-        for email in selected_room_info:
-            if selected_room_info[email]['status'] == 'Free':
-                free_room_info[email] = selected_room_info[email]
+        for roomname, roominfo in selected_room_info.iteritems():
+            if roominfo['status'] == 'Free':
+                free_room_info[roomname] = selected_room_info[roomname]
         return free_room_info
 
-    def _query(self, email):
-        room_name, room_size = self.rooms[email]
-        common.LOGGER.debug("Querying for %s", room_name)
+    def _query(self, roomname):
+        room_size = self.rooms[roomname]["size"]
+        email = self.rooms[roomname]["email"]
+        common.LOGGER.debug("Querying for %s", roomname)
 
         try:
             room_info = self.exchange_api.room_status( \
@@ -63,12 +64,12 @@ class AvailRoomFinder(object):
                                 timezone_offset=self.timezone)
 
             room_info['size'] = room_size
-            room_info['name'] = room_name
-            self.room_info[room_name] = room_info
+            room_info['name'] = roomname
+            self.room_info[roomname] = room_info
 
         except Exception as exception:
             self.error = exception
-            common.LOGGER.warning("Exception querying room %s: %s", room_name, str(exception))
+            common.LOGGER.warning("Exception querying room %s: %s", roomname, str(exception))
 
     def search(self, selected_rooms=None):
         """ Lookup availability status of rooms from the list of selected rooms """
@@ -79,8 +80,8 @@ class AvailRoomFinder(object):
         common.LOGGER.info("User %s searching for a room from %s to %s",
                            self.user, self.start_time, self.end_time)
 
-        for email in selected_rooms:
-            thread = threading.Thread(target=self._query, args=(email, ))
+        for roomname in selected_rooms:
+            thread = threading.Thread(target=self._query, args=(roomname, ))
             thread.start()
             worker_threads.append(thread)
 
