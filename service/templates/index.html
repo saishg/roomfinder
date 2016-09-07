@@ -86,17 +86,16 @@
 </head>
 <body onload="init()">
 <div id="optionContainer">
-    <div id="banner">
-        Conference Room Finder
-    </div>
+    <div id="banner">Conference Room Finder</div>
+    <br/>
     <div>
         <fieldset>
-            <label id="userLabel">CEC User ID</label> <label id="passwordLabel">Password</label><br/>
-            <input type="text" id="userNameInput"></input> <input type="password" id="passwordInput"></input><br/>
+        <label id="userLabel">Username</label><input type="text" id="userNameInput"></input>
+        <label id="passwordLabel">Password</label><input type="password" id="passwordInput"></input><br/>
         <label id="buildingLabel">Building</label> <select id="buildingSelect" onchange="loadFloorList(this.value)"></select>
         <label id="floorLabel">Floor</label> <select id="floorSelect"></select>
         <label id="roomSizeLabel">Attendees</label> <select id="roomSizeSelect"></select><br/>
-        <label id="dateLabel">Date</label><br/> <input type="date" id="bookDate"/><br/>
+        <label id="dateLabel">Date</label> <input type="date" id="bookDate"/>
         <label id="startTimeLabel">Time</label>
             <select id="startTimeHourSelect"></select>
             <select id="startTimeMinSelect"></select>
