@@ -50,7 +50,7 @@ def end_time(start_time, duration):
     start = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
     return (start + datetime.timedelta(hours=hours, minutes=mins)).isoformat()
 
-def read_room_list(filename):
+def read_room_list(filename=ROOMS_CSV):
     rooms = {}
 
     try:
@@ -59,7 +59,7 @@ def read_room_list(filename):
             for room_name, room_email, room_size in reader:
                 rooms[room_email] = room_name, int(room_size)
     except IOError as exception:
-        LOGGER.warning("Error openeing %s: %s", filename, str(exception))
+        LOGGER.warning("Error opening %s: %s", filename, str(exception))
 
     return rooms
 
