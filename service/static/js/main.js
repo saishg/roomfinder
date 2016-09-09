@@ -20,6 +20,7 @@ var date_days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
                  "31"];
 
 function init(){
+    hideUserPassword();
     loadCitiesList();
     createCombo(buildingSelect, buildings);
     createCombo(citySelect, cities);
@@ -45,6 +46,13 @@ function init(){
         current_hour = "0" + current_hour
     }
     document.getElementById("startTimeHourSelect").value = current_hour;
+}
+
+function hideUserPassword() {
+    userLabel.style.visibility = "hidden";
+    userNameInput.style.visibility = "hidden";
+    passwordLabel.style.visibility = "hidden";
+    passwordInput.style.visibility = "hidden";
 }
 
 function createCombo(container, data) {
@@ -92,6 +100,7 @@ function submitClickHandler() {
     }
     mytable.innerHTML = "";
     mytable.visiblity = false;
+    hideUserPassword();
 
     var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
     var timezone = new Date().getTimezoneOffset();
@@ -123,6 +132,11 @@ function showFreeRooms(rooms_json) {
         return;
     }
 
+    userLabel.style.visibility = "visible";
+    userNameInput.style.visibility = "visible";
+    passwordLabel.style.visibility = "visible";
+    passwordInput.style.visibility = "visible";
+
     mytable.innerHTML += "<td></td><td><small>Found " + Object.keys(rooms_json).length + " rooms</small></td>";
     for (var key in rooms_json) {
         var roomemail = rooms_json[key]["email"];
@@ -149,7 +163,7 @@ function bookRoom(roomname, roomemail) {
     xmlHttp.open("GET", url, false); // false for synchronous request
     xmlHttp.send(null);
 	mytable.innerHTML = '<tr><td>' + roomname + " " + xmlHttp.responseText + '</td></tr>';
-	
+    hideUserPassword();
 }
 
 

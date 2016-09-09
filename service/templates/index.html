@@ -90,8 +90,6 @@
     <br/>
     <div>
         <fieldset>
-        <label id="userLabel">Username</label><input type="text" id="userNameInput"></input>
-        <label id="passwordLabel">Password</label><input type="password" id="passwordInput"></input><br/>
         <label id="cityLabel">City</label> <select id="citySelect" onchange="loadBuildingList(this.value)"></select>
         <label id="buildingLabel">Building</label> <select id="buildingSelect" onchange="loadFloorList(this.value)"></select>
         <label id="floorLabel">Floor</label> <select id="floorSelect"></select>
@@ -103,7 +101,9 @@
         <label id="durationLabel">Duration</label>
             <select id="durationHourSelect"></select>
             <select id="durationMinSelect"></select><br/>
-        <button id="submitButton" onclick="submitClickHandler()">Search for free rooms</button>
+        <button id="submitButton" onclick="submitClickHandler()">Search for free rooms</button><br/><br/>
+        <label id="userLabel">Username</label><input type="text" id="userNameInput"></input>
+        <label id="passwordLabel">Password</label><input type="password" id="passwordInput"></input>
         </fieldset>
     </div>
 </div>
