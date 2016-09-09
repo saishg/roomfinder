@@ -4,6 +4,7 @@
 APIs to communicate with the Exchange Server
 """
 
+import ConfigParser
 import pipes
 import string
 import subprocess
@@ -13,9 +14,9 @@ import xml.etree.ElementTree as ET
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-DOMAIN = 'cisco.com'
-URL = 'https://mail.{}/ews/exchange.asmx'.format(DOMAIN)
+URL = 'https://mail.{}/ews/exchange.asmx'
 SCHEME_TYPES = './/{http://schemas.microsoft.com/exchange/services/2006/types}'
+CURL_COMMAND = "curl --silent --header 'content-type: text/xml;charset=utf-8' --data '{data}' --ntlm -u {user}:{password} {url}"
 AVAILABILITY_XML = None
 RESERVE_XML = None
 FIND_XML = None
@@ -23,20 +24,36 @@ FIND_XML = None
 class ExchangeApi(object):
     """ Class to communicate with the Exchange Server """
 
-    def __init__(self, user, password):
+    def __init__(self, user, password, cfg='exchange.cfg'):
         self.user = user
+        self.password = password
+
+        config = ConfigParser.ConfigParser()
+        if config.read(cfg):
+            self.domain = config.get('exchange', 'domain')
+            self.anon_user = config.get('exchange', 'anon_user')
+            self.anon_password = config.get('exchange', 'anon_password')
+        else:
+            self.domain = 'example.com'
+            self.anon_user = self.user
+            self.anon_password = self.password
+
+        self.url = URL.format(self.domain)
         self.command = 'curl --silent --header "content-type: text/xml;charset=utf-8"' \
-                       + " --data '{}'" \
+                       + " --data '{data}'" \
                        + " --ntlm " \
-                       + "-u " + pipes.quote(self.user) + ":" + pipes.quote(password) \
-                       + " " + URL
+                       + "-u {user}:{password}" \
+                       + " {url}"
 
     def _read_template(self, filename):
         with open(filename, "r") as fhandle:
             return string.Template(fhandle.read())
 
-    def _curl(self, post_data):
-        curl_command = self.command.format(post_data)
+    def _curl(self, post_data, user, password):
+        curl_command = CURL_COMMAND.format(data=post_data,
+                                           user=pipes.quote(user),
+                                           password=pipes.quote(password),
+                                           url=self.url)
         curl_process = subprocess.Popen(curl_command,
                                         stdout=subprocess.PIPE,
                                         shell=True)
@@ -56,7 +73,10 @@ class ExchangeApi(object):
                                                    starttime=start_time,
                                                    endtime=end_time))
 
-        response = self._curl(data)
+        if len(self.user) and len(self.password):
+            response = self._curl(data, self.user, self.password)
+        else:
+            response = self._curl(data, self.anon_user, self.anon_password)
 
         tree = ET.fromstring(response)
         status = "Free"
@@ -79,7 +99,7 @@ class ExchangeApi(object):
         if RESERVE_XML is None:
             RESERVE_XML = self._read_template("reserve_resource_template.xml")
 
-        user_email = self.user + '@' + DOMAIN
+        user_email = self.user + '@' + self.domain
         meeting_body = '{0} booked via RoomFinder by {1}'.format(room_name, user_email)
         subject = 'RoomFinder: {0}'.format(room_name)
 
@@ -93,7 +113,7 @@ class ExchangeApi(object):
                                               timezone=timezone_offset,
                                              ))
 
-        response = self._curl(data)
+        response = self._curl(data, self.user, self.password)
         return 'Success' in response
 
     def _parse_room_size(self, roomname):
@@ -117,7 +137,10 @@ class ExchangeApi(object):
 
         room_info = {}
         data = unicode(FIND_XML.substitute(name=prefix))
-        response = self._curl(data)
+        if len(self.user) and len(self.password):
+            response = self._curl(data, self.user, self.password)
+        else:
+            response = self._curl(data, self.anon_user, self.anon_password)
 
         tree = ET.fromstring(response)
         elems = tree.findall(SCHEME_TYPES + "Resolution")
