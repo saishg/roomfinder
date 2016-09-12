@@ -12,6 +12,7 @@ HTTPS_PORT = 8443
 
 PWD = os.getcwd()
 ROOMS_CSV = os.path.join(PWD, 'rooms.csv')
+COORDS_CSV = os.path.join(PWD, 'coords.csv')
 AVAILIBILITY_TEMPLATE = os.path.join(PWD, 'getavailibility_template.xml')
 SERVICE_DIR = os.path.join(PWD, 'service')
 CERT_DIR = os.path.join(PWD, 'certdir')
@@ -20,6 +21,7 @@ TEMPLATE_FOLDER = os.path.join(SERVICE_DIR, 'templates')
 ROOMS_CACHE = None
 ROOMNAMES_CACHE = None
 CITIES_CACHE = None
+COORDS_CACHE = {}
 BUILDINGS_CACHE = {}
 FLOORS_CACHE = {}
 
@@ -127,6 +129,38 @@ def get_city_list(filename=ROOMS_CSV):
 
     CITIES_CACHE = sorted(cities)
     return CITIES_CACHE
+
+def get_city_coords(filename=COORDS_CSV):
+    if len(COORDS_CACHE) > 0:
+        return COORDS_CACHE
+
+    cities = get_city_list()
+
+    with open(filename, "r") as fhandle:
+        reader = csv.reader(fhandle)
+        for city, latitude, longitude in reader:
+            if city in cities:
+                COORDS_CACHE[city] = float(latitude), float(longitude)
+
+    return COORDS_CACHE
+
+def get_closest_city(latitude, longitude):
+    coords_dict = get_city_coords()
+
+    closest_city = None
+    closest_distance = None
+
+    def distance(coords):
+        city_lat, city_long = coords
+        return (city_lat - latitude) ** 2 + (city_long - longitude) ** 2
+
+    for city, city_coords in coords_dict.iteritems():
+        city_distance = distance(city_coords)
+        if closest_city is None or city_distance < closest_distance:
+            closest_city = city
+            closest_distance = city_distance
+
+    return closest_city
 
 def write_room_list(rooms, filename=ROOMS_CSV):
     global ROOMS_CACHE
