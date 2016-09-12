@@ -37,6 +37,9 @@ function init(){
     loadFloorList(buildingSelect.value);
     floorSelect.value = "3";
     durationMinSelect.value = "30m";
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(getCity);
+    }
 
     var date = new Date();
     var today = date.toISOString().split('T')[0];
@@ -68,6 +71,18 @@ function loadCitiesList() {
     xmlHttp.open("GET", "/showcities", false);
     xmlHttp.send(null);
     cities = JSON.parse(xmlHttp.responseText);
+}
+
+function getCity(position) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "/getcity?latitude=" + position.coords.latitude + "&longitude=" + position.coords.longitude, false);
+    xmlHttp.send(null);
+    closestCity = JSON.parse(xmlHttp.responseText);
+    if (citySelect.value != closestCity) {
+        citySelect.value = closestCity;
+        loadBuildingList(citySelect.value);
+        loadFloorList(buildingSelect.value);
+    }
 }
 
 function loadFloorList(buildingname) {

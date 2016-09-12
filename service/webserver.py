@@ -23,6 +23,16 @@ def index():
 QueryParam = collections.namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees, timezone')
 BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password, timezone')
 
+@APP.route('/getcity', methods=['GET'])
+def get_city():
+    """ Get closest city in JSON """
+    latitude = flask.request.args.get('latitude')
+    longitude = flask.request.args.get('longitude')
+    city = common.get_closest_city(float(latitude), float(longitude))
+    common.LOGGER.info("Closest city is %s based on coordinates: %s, %s",
+                       city, latitude, longitude)
+    return json.dumps(city)
+
 @APP.route('/showcities', methods=['GET'])
 def show_cities():
     """ Serve list of cities in JSON """
