@@ -8,6 +8,16 @@
             color: #555555;
             font-family: "Verdana","Calibri",Geneva,sans-serif;
         }
+        #contact{
+            color: black;
+            font-size: 10px;
+            text-align: right;
+        }
+        #search{
+            color: black;
+            font-size: 15px;
+            text-align: center;
+        }
         #banner{
             background-color: #AAAAAA;
             color: white;
@@ -87,8 +97,12 @@
 <body onload="init()">
 <div id="optionContainer">
     <div id="banner">Conference Room Finder</div>
-    <br/>
+    <div id="contact">
+        <a href="mailto:mailfinder@cisco.com">Report a bug</a> &nbsp; &nbsp; &nbsp;
+        <a href="mailto:sgersapp@cisco.com">Contact Us</a> &nbsp; &nbsp; &nbsp;
     <div>
+    <br/>
+    <div id="search">
         <fieldset>
         <label id="cityLabel">City</label> <select id="citySelect" onchange="loadBuildingList(this.value)"></select>
         <label id="buildingLabel">Building</label> <select id="buildingSelect" onchange="loadFloorList(this.value)"></select>
