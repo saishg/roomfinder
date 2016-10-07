@@ -43,52 +43,20 @@
         label{
             display: inline-block;
             text-align: left;
-            margin-top: 15px;
             margin-bottom: 3px;
         }
-        input{
+        input {
             width: 130px;
             height: 25px;
         }
         #userLabel{
             width: 130px;
         }
-        #passwordLabel{
-            width: 130px;
-            margin-left: 5px;
-        }
-        #passwordInput{
-            margin-left: 5px;
-        }
-        #buildingSelect{
-            margin-left: 3px;
-        }
-        #floorLabel{
-            margin-left: 25px;
-        }
-        #floorSelect{
-            margin-left: 3px;
-        }
-        #roomSizeLabel{
-            margin-left: 25px;
-        }
-        #roomSizeSelect{
-            margin-left: 3px;
-        }
-        #startTimeHourSelect{
-            margin-left: 3px;
-        }
-        #durationLabel{
-            margin-left: 25px;
-        }
-        #durationHourSelect{
-            margin-left: 3px;
-        }
-        #submitButton{
+        #submitButton {
             margin-top: 30px;
-            margin-left: 1px;
             height: 30px;
-            font-family: "Verdana","Calibri",Geneva,sans-serif;
+            width: 90%;
+            font-family: "Verdana";
             font-size: 16px;
             font-weight: bold;
         }
@@ -144,11 +112,11 @@
     <tr>
         <td>
             <label id="dateLabel">Date</label> <br/>
-            <input type="date" id="bookDate"/>
+            <input type="date" style="width:175%" id="bookDate"/>
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="2">
             <label id="startTimeLabel">Time</label> <br/>
             <select id="startTimeHourSelect"></select>
             <select id="startTimeMinSelect"></select>
@@ -161,7 +129,7 @@
     </tr>
     </table>
 
-    <button id="submitButton" onclick="submitClickHandler()">Search for free rooms</button><br/><br/>
+    <button id="submitButton" width="100%" onclick="submitClickHandler()">Search</button><br/><br/>
 </div>
 
 
