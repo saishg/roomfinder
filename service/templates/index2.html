@@ -1,0 +1,177 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="static/js/main.js"></script>
+    <style>
+        body {
+            background-color: white;
+            color: black;
+            font-family: "Verdana";
+        }
+        #contact{
+            color: black;
+            font-size: 10px;
+            text-align: right;
+        }
+        #searchpane{
+            background-color: #FFFFFF;
+            color: black;
+            font-size: 15px;
+            text-align: left;
+            float: left;
+            width: 30%;
+            height: 100%;
+        }
+        #banner{
+            background-color: #AAAAAA;
+            color: white;
+            font-size: 60px;
+            padding: 10px;
+            border-left: 10px solid orange;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #resultpane{
+            background-color: #EFEFEF;
+            color: black;
+            font-size: 15px;
+            text-align: center;
+            float: right;
+            width: 70%;
+            height: 100%;
+        }
+        label{
+            display: inline-block;
+            text-align: left;
+            margin-top: 15px;
+            margin-bottom: 3px;
+        }
+        input{
+            width: 130px;
+            height: 25px;
+        }
+        #userLabel{
+            width: 130px;
+        }
+        #passwordLabel{
+            width: 130px;
+            margin-left: 5px;
+        }
+        #passwordInput{
+            margin-left: 5px;
+        }
+        #buildingSelect{
+            margin-left: 3px;
+        }
+        #floorLabel{
+            margin-left: 25px;
+        }
+        #floorSelect{
+            margin-left: 3px;
+        }
+        #roomSizeLabel{
+            margin-left: 25px;
+        }
+        #roomSizeSelect{
+            margin-left: 3px;
+        }
+        #startTimeHourSelect{
+            margin-left: 3px;
+        }
+        #durationLabel{
+            margin-left: 25px;
+        }
+        #durationHourSelect{
+            margin-left: 3px;
+        }
+        #submitButton{
+            margin-top: 30px;
+            margin-left: 1px;
+            height: 30px;
+            font-family: "Verdana","Calibri",Geneva,sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        fieldset{
+            border: none;
+            width: 650px;
+            margin: 0px auto;
+        }
+        #mytable{
+            margin: auto;
+            margin-top: 30px;
+            width: 650px;
+        }
+        td{
+            padding: 5px;
+        }
+    </style>
+</head>
+<body onload="init()">
+<div id="optionContainer">
+    <div id="banner">Conference Room Finder</div>
+    <div id="contact">
+        <a href="mailto:roomfinder@cisco.com">Report a bug</a> &nbsp; &nbsp; &nbsp;
+        <a href="mailto:sgersapp@cisco.com">Contact Us</a> &nbsp; &nbsp; &nbsp;
+    </div>
+</div>
+
+<br/>
+<div id="searchpane">
+    <table width="100%">
+    <tr>
+        <td>
+            <label id="cityLabel">City</label> <br/>
+            <select id="citySelect" onchange="loadBuildingList(this.value)"></select>
+        </td>
+
+        <td align="left">
+            <label id="roomSizeLabel">Attendees</label> <br/>
+            <select id="roomSizeSelect"></select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label id="buildingLabel">Building</label> <br />
+            <select id="buildingSelect" onchange="loadFloorList(this.value)"></select><br/>
+        </td>
+
+        <td>
+            <label id="floorLabel">Floor</label> <br/>
+            <select id="floorSelect"></select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label id="dateLabel">Date</label> <br/>
+            <input type="date" id="bookDate"/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label id="startTimeLabel">Time</label> <br/>
+            <select id="startTimeHourSelect"></select>
+            <select id="startTimeMinSelect"></select>
+        </td>
+        <td>
+            <label id="durationLabel">Duration</label> <br />
+            <select id="durationHourSelect"></select>
+            <select id="durationMinSelect"></select>
+        </td>
+    </tr>
+    </table>
+
+    <button id="submitButton" onclick="submitClickHandler()">Search for free rooms</button><br/><br/>
+</div>
+
+
+<div id="resultpane">
+
+    <label id="userLabel">Username</label><input type="text" id="userNameInput"></input>
+    <label id="passwordLabel">Password</label><input type="password" id="passwordInput"></input>
+    <table id="mytable">
+    </table>
+</div>
+
+</body>
+</html>
