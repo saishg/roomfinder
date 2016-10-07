@@ -172,6 +172,24 @@ function bookRoom(roomname, roomemail) {
     var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&roomname=${roomname}&roomemail=${roomemail}&starttime=${bookDate.value}T${startTimeHourSelect.value}:${startTimeMinSelect.value}:00&duration=${durationHourSelect.value}${durationMinSelect.value}&timezone=${timezone}`;
     var xmlHttp = new XMLHttpRequest();
 
+    if (userNameInput.value == "") {
+        userNameInput.style.backgroundColor = "yellow";
+    }
+    else {
+        userNameInput.style.backgroundColor = "";
+    }
+
+    if (passwordInput.value == "") {
+        passwordInput.style.backgroundColor = "yellow";
+    }
+    else {
+        passwordInput.style.backgroundColor = "";
+    }
+
+    if (userNameInput.value == "" || passwordInput.value == "") {
+        return;
+    }
+
     url = "/bookroom";
     url = url.concat(queryString);
 
