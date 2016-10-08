@@ -19,6 +19,8 @@ var date_days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
                  "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
                  "31"];
 
+var DAYS_AHEAD = 0;
+
 function init(){
     hideUserPassword();
     loadCitiesList();
@@ -43,12 +45,28 @@ function init(){
 
     var date = new Date();
     var today = date.toISOString().split('T')[0];
-    document.getElementById("bookDate").setAttribute('value', today);
+    bookDate.value = today;
     var current_hour = date.getHours();
-    if (current_hour.length < 2) {
+    if (current_hour < 9) {
         current_hour = "0" + current_hour
     }
-    document.getElementById("startTimeHourSelect").value = current_hour;
+    startTimeHourSelect.value = current_hour;
+}
+
+function nextDate() {
+    var nextDate = new Date();
+    DAYS_AHEAD += 1;
+    nextDate.setDate((new Date()).getDate() + DAYS_AHEAD);
+    bookDate.value = nextDate.toISOString().split('T')[0];
+}
+
+function prevDate() {
+    var nextDate = new Date();
+    if (DAYS_AHEAD > 0) {
+        DAYS_AHEAD -= 1;
+    }
+    nextDate.setDate((new Date()).getDate() + DAYS_AHEAD);
+    bookDate.value = nextDate.toISOString().split('T')[0];
 }
 
 function hideUserPassword() {
