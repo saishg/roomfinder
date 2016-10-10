@@ -23,7 +23,7 @@
                     <label class="attendeesLabel">Attendees</label>
                 </div>
                 <div>
-                    <select id="citySelect" class="form-control selectStyle"></select>
+                    <select id="citySelect" class="form-control selectStyle" onchange="loadBuildingList(this.value)"></select>
                     <select id="roomSizeSelect" class="form-control selectStyle"></select>
                 </div>
                 <div>
@@ -31,7 +31,7 @@
                     <label class="floorLabel">Floor</label>
                 </div>
                 <div class="buildingFloorSelectContainer">
-                    <select id="buildingSelect" class="form-control selectStyle"></select>
+                    <select id="buildingSelect" class="form-control selectStyle" onchange="loadFloorList(this.value)"></select>
                     <select id="floorSelect" class="form-control selectStyle"></select>
                 </div>
                 <div class="dateContainer">

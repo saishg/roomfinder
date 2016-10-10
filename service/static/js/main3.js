@@ -31,6 +31,7 @@ function init(){
 
 function createCombo(container, data) {
     var options = '';
+    container.options.length = 0;
     for (var i = 0; i < data.length; i++) {
         container.options.add(new Option(data[i], data[i]));
     }
