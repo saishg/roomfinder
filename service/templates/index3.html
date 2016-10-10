@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Room finder</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="static/js/main3.js"></script>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body onload="init()">
+
+<div>
+    <div class="titleContainer">
+        <h2 class="titleText">Conference Room Finder</h2>
+    </div>
+    <div class="leftAndRightDivContainer">
+        <div class="form-group tableRow">
+            <div class="leftDiv">
+                <div>
+                    <label class="cityLabel">City</label>
+                    <label class="attendeesLabel">Attendees</label>
+                </div>
+                <div>
+                    <select id="citySelect" class="form-control selectStyle"></select>
+                    <select id="roomSizeSelect" class="form-control selectStyle"></select>
+                </div>
+                <div>
+                    <label class="buildingLabel">Building</label>
+                    <label class="floorLabel">Floor</label>
+                </div>
+                <div class="buildingFloorSelectContainer">
+                    <select id="buildingSelect" class="form-control selectStyle"></select>
+                    <select id="floorSelect" class="form-control selectStyle"></select>
+                </div>
+                <div class="dateContainer">
+                    <label class="dateText">Date</label>
+                    <input id="dateInput" type="date" class="form-control dateInput" />
+                </div>
+                <label class="timeText">Time</label>
+                <hr>
+                <div id="tableContainer" class="tableContainer" > </div>
+
+                <button class="btn btn-default searchButton form-control" type="button" onclick="handleSearchBtnClick()" >Search</button>
+            </div>
+
+            <div class="rightDiv">
+                <label class="rightDivLbl"> 1. Select A Room </label>
+                <div id="roomNamesContainer"></div>
+                <label class="rightDivLbl"> 2. Enter User name and Password </label>
+                <div>
+                    <label class="userNamePswdLbl">User name</label>
+                </div>
+                <input  type="text" id="userNameInput" class="form-control userNamePswdInputText" placeholder="User name"></input>
+                <div>
+                    <label class="userNamePswdLbl">Password</label>
+                </div>
+                <input  type="password" id="passwordInput" class="form-control userNamePswdInputText" placeholder="Password"></input>
+                <button class="btn btn-default reserveButton form-control" type="button" onclick="handleReserveBtnClick()" >Reserve</button>
+
+                <div>
+                    <H4 class="userNamePswdLbl">Site Map</H4>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

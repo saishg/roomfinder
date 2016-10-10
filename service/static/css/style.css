@@ -1,0 +1,184 @@
+label {
+    font-size: x-small;
+}
+
+.cityLabel {
+    margin-left: 20px;
+}
+
+.attendeesLabel {
+    margin-left: 60%;
+}
+
+.buildingLabel {
+    clear: left;
+    float: left;
+    margin-left: 20px;
+}
+
+.floorLabel {
+    float: left;
+    margin-left: 57%;
+}
+
+#citySelect,  #buildingSelect{
+    width: 60%;
+    background-color: lightgray;
+}
+
+#roomSizeSelect,  #floorSelect{
+    width: 20%;
+    background-color: lightgray;
+}
+
+.buildingFloorSelectContainer {
+    clear: left;
+}
+
+.selectStyle {
+    width: 30%;
+    margin-left: 20px;
+    float: left;
+    padding: 10px;
+}
+
+.leftAndRightDivContainer {
+    width: 100%;
+    display: table;
+}
+.tableRow {
+    display: table-row;
+}
+.leftDiv {
+    width: 40%;
+    display: table-cell;
+    border-style: solid;
+    border-width: 1px;
+}
+.rightDiv {
+    width: 60%;
+    display: table-cell;
+    border-style: solid;
+    border-width: 1px;
+    background-color: lightgray;
+}
+.titleContainer {
+    border-bottom: 2px solid #ddd;
+}
+
+.titleText {
+    margin-left: 40px;
+}
+
+.dateContainer {
+    clear: left;
+    margin: 40px 0px 0px 20px;
+}
+
+.dateText {
+    float: left;
+    margin-right: 20px;
+}
+
+.dateInput {
+    float: left;
+    width: 60%;
+}
+
+.timeText {
+    clear: left;
+    float: left;
+    margin-left: 20px;
+}
+
+
+
+.table-borderless tbody tr td, .table-borderless tbody tr th, .table-borderless thead tr th {
+    border: none;
+    td {
+        width: 90px;
+    }
+}
+
+.tableContainer {
+    height: 300px;
+    margin: 10px 20px 0px 20px;
+    overflow: scroll;
+}
+
+.searchButton {
+    margin: 20px;
+    width: 90%;
+    height: 40px;
+    background-color: lightgray;
+    border: 0.5px solid #888888;
+    box-shadow: 1px 2px 4px #888888;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    margin: 0px 20px 0px 20px;
+    background: #333;
+    clear: left;
+}
+
+.timeLabel {
+    width: 30px;
+    display:block;
+    text-align:right;
+    float: left;
+}
+
+.timeTableRow {
+    margin: 5px 0px 0px 0px;
+}
+
+.tableButton {
+    width: 80%;
+    height: 40%;
+    margin-left: 20px;
+    background-color: white;
+    border: 0.5px solid #888888;
+    box-shadow: 1px 2px 3px #888888;
+}
+
+.tableBtnEnabled {
+    box-shadow: 1px 0px 1px 1px deepskyblue;
+}
+.timeLabelEnabled {
+    color: deepskyblue;
+}
+
+.roomNamesRow {
+    margin: 5px 0px 0px 40px;
+}
+
+.roomNamesRadioLbl {
+    margin-left: 10px;
+    font-size: small;
+}
+
+.rightDivLbl {
+    margin-left: 10px;
+    margin-top: 10px;
+    font-size: medium;
+}
+
+.userNamePswdLbl {
+    margin-left: 45px;
+}
+
+.userNamePswdInputText {
+    margin-left: 40px;
+    width: 40%;
+}
+
+.reserveButton {
+    margin: 40px;
+    width: 20%;
+    height: 30px;
+    background-color: lightgray;
+
+    box-shadow: 1px 0px 1px 1px #888888;
+}
