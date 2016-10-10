@@ -1,18 +1,24 @@
-var buildings = ["SJC-1", "SJC-2" , "SJC-3" , "SJC-4", "SJC-5"];
-var floors = ["1", "2", "3", "4", "5", "Any"];;
+var cities = [];
+var buildings = [];
+var floors = [];;
 var attendees = ["1", "2", "4", "5", "6", "7", "8", "9", "10", "15", "20", "25", "30", "50", "70", "100"];
-var cities = ["San Jose","San Francisco","Banglore","Tokyo"];
 var times = ["08:00AM", "09:00AM","10:00AM","11:00AM","12:00PM","01:00PM","02:00PM","03:00PM","04:00PM","05:00PM",];
 var roomNames = ["SJC19-3-ARTHUR (12) (Public)","SJC19-3-GRADUATE (8) (Public)","SJC19-3-DR. STRANGELOVE (12) (Public)","SJC19-3-WILD STRAWBERRIES (6) Video (Public)", "SJC19-3-DAZED AND CONFUSED (12)"];
 var startTimeBtn, endTimeBtn;
 var selectedRoom;
 
 function init(){
+    loadCitiesList();
 
     createCombo(buildingSelect,buildings);
     createCombo(floorSelect,floors);
     createCombo(citySelect,cities);
     createCombo(roomSizeSelect,attendees);
+
+    citySelect.value = "San Jose";
+    loadBuildingList(citySelect.value);
+    buildingSelect.value = "SJC19";
+    loadFloorList(buildingSelect.value);
 
     setTodayDate();
     createTimeRows(times);
@@ -28,6 +34,41 @@ function createCombo(container, data) {
     for (var i = 0; i < data.length; i++) {
         container.options.add(new Option(data[i], data[i]));
     }
+}
+
+function loadCitiesList() {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "/showcities", false);
+    xmlHttp.send(null);
+    cities = JSON.parse(xmlHttp.responseText);
+}
+
+function getCity(position) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "/getcity?latitude=" + position.coords.latitude + "&longitude=" + position.coords.longitude, false);
+    xmlHttp.send(null);
+    closestCity = JSON.parse(xmlHttp.responseText);
+    if (citySelect.value != closestCity) {
+        citySelect.value = closestCity;
+        loadBuildingList(citySelect.value);
+        loadFloorList(buildingSelect.value);
+    }
+}
+
+function loadFloorList(buildingname) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "/showfloors?buildingname=" + buildingname, false);
+    xmlHttp.send(null);
+    floors = JSON.parse(xmlHttp.responseText);
+    createCombo(floorSelect, floors);
+}
+
+function loadBuildingList(city) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "/showbuildings?city=" + city, false);
+    xmlHttp.send(null);
+    buildings = JSON.parse(xmlHttp.responseText);
+    createCombo(buildingSelect, buildings);
 }
 
 function createTimeRows(data) {
