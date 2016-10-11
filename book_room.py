@@ -20,18 +20,24 @@ class ReserveAvailRoom(object):
     """ Class to request an Exchange Server to reserve a room """
 
     def __init__(self, user, password,
-                 roomname, roomemail,
-                 start_time=common.TIME_NOW, duration='1h',
+                 roomname, roomemail=None,
+                 start_time=common.TIME_NOW, duration=None, end_time=None,
                  raw_password=None,
                  timezone=common.SJ_TIME_ZONE):
         self.user = user
         self.roomname = roomname
-        self.roomemail = roomemail
+        if roomemail is None:
+            self.roomemail = common.read_room_list()[roomname]["email"]
+        else:
+            self.roomemail = roomemail
         self.start_time = start_time
         self.timezone = self._calc_timezone_str(timezone)
         password = raw_password or base64.b64decode(urllib.unquote(password))
         self.exchange_api = ExchangeApi(user, password)
-        self.end_time = common.end_time(self.start_time, duration)
+        if end_time is None:
+            self.end_time = common.end_time(self.start_time, duration)
+        if duration is None:
+            self.end_time = end_time
 
     def _calc_timezone_str(self, timezone):
         try:
