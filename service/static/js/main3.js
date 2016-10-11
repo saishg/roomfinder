@@ -18,6 +18,9 @@ var selectedRoom;
 function init(){
     loadCitiesList();
 
+    hideUsernamePasswordFields();
+    hideRoomList();
+
     createCombo(buildingSelect,buildings);
     createCombo(floorSelect,floors);
     createCombo(citySelect,cities);
@@ -146,9 +149,8 @@ function setTodayDate() {
 }
 
 function handleSearchBtnClick() {
-    var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
     var timezone = new Date().getTimezoneOffset();
-    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&date=${dateInput.value}&starttime=${startTimeBtn.value}&endtime=${endTimeBtn.value}&attendees=${roomSizeSelect.value}&timezone=${timezone}`;
+    var queryString = `\?user=\&password=&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&date=${dateInput.value}&starttime=${startTimeBtn.value}&endtime=${endTimeBtn.value}&attendees=${roomSizeSelect.value}&timezone=${timezone}`;
     loadRooms(queryString);
 }
 
@@ -168,11 +170,15 @@ function loadRooms(queryString) {
 function showFreeRooms(rooms_json) {
     error = rooms_json["Error"];
     if (typeof error != "undefined") {
-        roomNamesContainer.innerHTML += "<td>Error: " + error + "</td>";
+        resultMessage.innerHTML = "Error: " + error;
         return;
     }
+    else {
+        resultMessage.innerHTML = "";
+    }
 
-    roomNamesContainer.innerHTML = "<div class='roomNamesRow'><h4>" + Object.keys(rooms_json).length + " room(s) available</h4></div>";
+    roomNamesContainer.innerHTML = "<label class='rightDivLbl' id='selectRoomText'> 1. Select A Room </label>";
+    roomNamesContainer.innerHTML += "<div class='roomNamesRow'><h4>" + Object.keys(rooms_json).length + " room(s) available</h4></div>";
     for (var key in rooms_json) {
         var roomemail = rooms_json[key]["email"];
         if (typeof roomemail != "undefined") {
@@ -183,6 +189,7 @@ function showFreeRooms(rooms_json) {
 
 function handleSelectRoomBtn (radioBtn) {
     selectedRoom = radioBtn.value;
+    showUsernamePasswordFields();
 }
 
 function handleReserveBtnClick() {
@@ -214,12 +221,30 @@ function handleReserveBtnClick() {
 
     xmlHttp.open("GET", url, false); // false for synchronous request
     xmlHttp.send(null);
-    roomNamesContainer = '';
-    hideUserPassword();
+    hideRoomList();
+    hideUsernamePasswordFields();
+	resultMessage.innerHTML = selectedRoom + " " + xmlHttp.responseText;
 }
 
-function hideUserPassword() {
-    userNameInput.value = "";
-    passwordInput.value = "";
+function hideRoomList() {
+    roomNamesContainer.innerHTML = '';
+    roomNamesContainer.style.visibility = false;
+}
+
+function showUsernamePasswordFields() {
+    var userpassHTML = "<label class='rightDivLbl'> 2. Enter User name and Password </label>";
+    userpassHTML += "<div><label class='userNamePswdLbl'>User name</label></div>";
+    userpassHTML += "<input  type='text' id='userNameInput' class='form-control userNamePswdInputText' placeholder='User name'></input>";
+    userpassHTML += "<div><label class='userNamePswdLbl'>Password</label></div>";
+    userpassHTML += "<input  type='password' id='passwordInput' class='form-control userNamePswdInputText' placeholder='Password'></input>";
+    userpassHTML += "<button class='btn btn-default reserveButton form-control' type='button' onclick='handleReserveBtnClick()' >Reserve</button>";
+
+    usernamePasswordContainer.style.visibility = true;
+    usernamePasswordContainer.innerHTML = userpassHTML;
+}
+
+function hideUsernamePasswordFields() {
+    usernamePasswordContainer.style.visibility = false;
+    usernamePasswordContainer.innerHTML = "";
 }
 
