@@ -1,9 +1,16 @@
 var cities = [];
 var buildings = [];
 var floors = [];;
-var attendees = ["1", "2", "4", "5", "6", "7", "8", "9", "10", "15", "20", "25", "30", "50", "70", "100"];
-var times = ["08:00AM", "09:00AM","10:00AM","11:00AM","12:00PM","01:00PM","02:00PM","03:00PM","04:00PM","05:00PM",];
-var roomNames = ["SJC19-3-ARTHUR (12) (Public)","SJC19-3-GRADUATE (8) (Public)","SJC19-3-DR. STRANGELOVE (12) (Public)","SJC19-3-WILD STRAWBERRIES (6) Video (Public)", "SJC19-3-DAZED AND CONFUSED (12)"];
+var attendees = ["1", "2", "4", "5", "6", "7", "8", "9", "10", "15", "20",
+                 "25", "30", "50", "70", "100"];
+var times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+//var times = ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00",
+//             "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30",
+//             "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00",
+//             "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30",
+//             "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00",
+//             "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30",
+//             "21:00", "21:30", "22:00", "22:30", "23:00", "23:30",];
 var startTimeBtn, endTimeBtn;
 var selectedRoom;
 
@@ -23,10 +30,8 @@ function init(){
     setTodayDate();
     createTimeRows(times);
 
-    createAvailableRoomList(roomNames);
     startTimeBtn=timeBtn0;
     endTimeBtn=timeBtn0;
-
 }
 
 function createCombo(container, data) {
@@ -135,8 +140,10 @@ function setTodayDate() {
 }
 
 function handleSearchBtnClick() {
+    var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
+    var timezone = new Date().getTimezoneOffset();
 
-    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&starttime=${startTimeBtn.value}&endtime=${endTimeBtn.value}&attendees=${roomSizeSelect.value}&date=${dateInput.value}&timezone=${timezone}`;
+    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&date=${dateInput.value}&starttime=${startTimeBtn.value}&endtime=${endTimeBtn.value}&attendees=${roomSizeSelect.value}&timezone=${timezone}`;
     loadRooms(queryString);
 }
 
@@ -153,16 +160,24 @@ function loadRooms(queryString) {
     }
 }
 
+function showFreeRooms(rooms_json) {
+    error = rooms_json["Error"];
+    if (typeof error != "undefined") {
+        roomNamesContainer.innerHTML += "<td>Error: " + error + "</td>";
+        return;
+    }
 
-function createAvailableRoomList (data) {
-    roomNamesContainer.innerHTML += "<div class='roomNamesRow'><h4>"+data.length+" Rooms Available</h4></div>";
-    for (var i = 0; i < data.length; i++) {
-        roomNamesContainer.innerHTML += "<div class='roomNamesRow'><input type='radio' name='roomRadio' value='" +data[i]+ "' onclick='handleSelectRoomBtn(this)'><label class='roomNamesRadioLbl'>"+data[i]+"</label></div>";
+    roomNamesContainer.innerHTML = "<div class='roomNamesRow'><h4>" + Object.keys(rooms_json).length + " room(s) available</h4></div>";
+    for (var key in rooms_json) {
+        var roomemail = rooms_json[key]["email"];
+        if (typeof roomemail != "undefined") {
+            roomNamesContainer.innerHTML += "<div class='roomNamesRow'><input type='radio' name='roomRadio' value='" + key + "' onclick='handleSelectRoomBtn(" + roomemail + ")'><label class='roomNamesRadioLbl'>" + key + "</label></div>";
+        }
     }
 }
 
-function handleSelectRoomBtn (radioBtn) {
-    selectedRoom = radioBtn.value;
+function handleSelectRoomBtn (roomemail) {
+    selectedRoom = roomemail;
 }
 
 function handleReserveBtnClick() {
