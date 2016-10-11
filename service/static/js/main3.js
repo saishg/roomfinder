@@ -171,24 +171,19 @@ function showFreeRooms(rooms_json) {
     for (var key in rooms_json) {
         var roomemail = rooms_json[key]["email"];
         if (typeof roomemail != "undefined") {
-            roomNamesContainer.innerHTML += "<div class='roomNamesRow'><input type='radio' name='roomRadio' value='" + key + "' onclick='handleSelectRoomBtn(" + roomemail + ")'><label class='roomNamesRadioLbl'>" + key + "</label></div>";
+            roomNamesContainer.innerHTML += "<div class='roomNamesRow'><input type='radio' name='roomRadio' value='" + key + "' onclick='handleSelectRoomBtn(this)'><label class='roomNamesRadioLbl'>" + key + "</label></div>";
         }
     }
 }
 
-function handleSelectRoomBtn (roomemail) {
-    selectedRoom = roomemail;
+function handleSelectRoomBtn (radioBtn) {
+    selectedRoom = radioBtn.value;
 }
 
 function handleReserveBtnClick() {
-    bookRoom(selectedRoom, selectedRoom)
-}
-
-function bookRoom(roomname, roomemail) {
     var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
     var timezone = new Date().getTimezoneOffset();
-
-    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&roomname=${roomname}&roomemail=${roomemail}&starttime=${startTimeBtn.value}&endtime=${endTimeBtn.value}&date=${dateInput.value}&timezone=${timezone}`;
+    var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&roomname=${selectedRoom}&starttime=${startTimeBtn.value}&endtime=${endTimeBtn.value}&date=${dateInput.value}&timezone=${timezone}`;
     var xmlHttp = new XMLHttpRequest();
 
     if (userNameInput.value == "") {
