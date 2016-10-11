@@ -109,7 +109,7 @@ function loadFloorList(buildingname) {
     xmlHttp.send(null);
     floors = JSON.parse(xmlHttp.responseText);
     createCombo(floorSelect, floors);
-    result.innerHTML = ""
+    resultMessage.innerHTML = "";
 }
 
 function loadBuildingList(city) {
@@ -169,7 +169,7 @@ function showFreeRooms(rooms_json) {
     userNameInput.style.visibility = "visible";
     passwordLabel.style.visibility = "visible";
     passwordInput.style.visibility = "visible";
-    result.innerHTML = ""
+    resultMessage.innerHTML = "";
     mytable.innerHTML += "<td></td><td><small>Found " + Object.keys(rooms_json).length + " rooms</small></td>";
     for (var key in rooms_json) {
         var roomemail = rooms_json[key]["email"];
@@ -215,7 +215,7 @@ function bookRoom(roomname, roomemail) {
     xmlHttp.send(null);
     mytable.innerHTML = "";
     mytable.visiblity = false;
-    result.innerHTML = roomname + " " + xmlHttp.responseText;
+    resultMessage.innerHTML = roomname + " " + xmlHttp.responseText;
     hideUserPassword();
 }
 

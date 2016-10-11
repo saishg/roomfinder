@@ -17,7 +17,7 @@ AVAILIBILITY_TEMPLATE = os.path.join(PWD, 'getavailibility_template.xml')
 SERVICE_DIR = os.path.join(PWD, 'service')
 CERT_DIR = os.path.join(PWD, 'certdir')
 TEMPLATE_FOLDER = os.path.join(SERVICE_DIR, 'templates')
-FLOORMAP_DIR = os.path.join(TEMPLATE_FOLDER, 'floorplan')
+FLOORMAP_DIR = os.path.join(TEMPLATE_FOLDER, 'floormap')
 
 ROOMS_CACHE = None
 ROOMNAMES_CACHE = None
