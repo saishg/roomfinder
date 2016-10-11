@@ -11,7 +11,8 @@ var times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:
 //             "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00",
 //             "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30",
 //             "21:00", "21:30", "22:00", "22:30", "23:00", "23:30",];
-var startTimeBtn, endTimeBtn;
+var startTimeBtn;
+var endTimeBtn;
 var selectedRoom;
 
 function init(){
@@ -26,12 +27,13 @@ function init(){
     loadBuildingList(citySelect.value);
     buildingSelect.value = "SJC19";
     loadFloorList(buildingSelect.value);
+    floorSelect.value = "3";
 
     setTodayDate();
     createTimeRows(times);
 
-    startTimeBtn=timeBtn0;
-    endTimeBtn=timeBtn0;
+    startTimeBtn = timeBtn0;
+    endTimeBtn = timeBtn0;
 }
 
 function createCombo(container, data) {
@@ -85,11 +87,11 @@ function createTimeRows(data) {
 }
 
 function handleSelectTimeBtn (btn) {
-    if(startTimeBtn == null) {
+    if (startTimeBtn == null) {
         startTimeBtn = btn;
         endTimeBtn = btn;
     }
-    else if(startTimeBtn == endTimeBtn) {
+    else if (startTimeBtn == endTimeBtn) {
         endTimeBtn = btn;
     }
     else {
@@ -99,7 +101,7 @@ function handleSelectTimeBtn (btn) {
 
     var startIndex = (startTimeBtn.id).charAt(startTimeBtn.id.length-1);
     var endIndex = (endTimeBtn.id).charAt(endTimeBtn.id.length-1);
-    if(startIndex > endIndex) {
+    if (startIndex > endIndex) {
         var temp = startIndex;
         startIndex = endIndex;
         endIndex = temp;
@@ -109,7 +111,7 @@ function handleSelectTimeBtn (btn) {
     for(var i=0 ; i<times.length ;i++) {
         btn = eval('timeBtn'+i);
         lbl = eval('timeLbl'+i);
-        if(i>= startIndex && i<=endIndex) {
+        if (i>= startIndex && i<=endIndex) {
             btn.classList.add('tableBtnEnabled');
             lbl.classList.add('timeLabelEnabled');
         }
@@ -125,16 +127,16 @@ function handleSelectTimeBtn (btn) {
 function setTodayDate() {
     var today = new Date();
     var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
+    var mm = today.getMonth() + 1; //January is 0!
 
     var yyyy = today.getFullYear();
-    if(dd<10){
-        dd='0'+dd
+    if (dd < 10) {
+        dd = '0' + dd
     }
-    if(mm<10){
-        mm='0'+mm
+    if (mm < 10) {
+        mm = '0' + mm
     }
-    var formattedDate = yyyy +'-' + mm +'-'+dd;
+    var formattedDate = yyyy +'-' + mm + '-' + dd;
 
     dateInput.value = formattedDate;
 }
@@ -142,7 +144,6 @@ function setTodayDate() {
 function handleSearchBtnClick() {
     var passwordb64 = encodeURIComponent(btoa(passwordInput.value));
     var timezone = new Date().getTimezoneOffset();
-
     var queryString = `\?user=${userNameInput.value}\&password=${passwordb64}&buildingname=${buildingSelect.value}&floor=${floorSelect.value}&date=${dateInput.value}&starttime=${startTimeBtn.value}&endtime=${endTimeBtn.value}&attendees=${roomSizeSelect.value}&timezone=${timezone}`;
     loadRooms(queryString);
 }
