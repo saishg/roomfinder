@@ -85,6 +85,8 @@ function loadBuildingList(city) {
     xmlHttp.send(null);
     buildings = JSON.parse(xmlHttp.responseText);
     createCombo(buildingSelect, buildings);
+    resultMessage.style.display = "none";
+    resultMap.style.display = "none";
 }
 
 function createTimeRows(data) {
@@ -180,9 +182,11 @@ function showFreeRooms(rooms_json) {
         return;
     }
     else {
-        resultMessage.innerHTML = "";
+	resultMessage.style.display = "none";
+	resultMap.style.display = "none";
     }
 
+    roomNamesContainer.style.display = "block";
     roomNamesContainer.innerHTML = "<label class='rightDivLbl' id='selectRoomText'> 1. Select A Room </label>";
     roomNamesContainer.innerHTML += "<div class='roomNamesRow'><h4>" + Object.keys(rooms_json).length + " room(s) available</h4></div>";
     for (var key in rooms_json) {
@@ -231,12 +235,15 @@ function handleReserveBtnClick() {
     xmlHttp.send(null);
     hideRoomList();
     hideUsernamePasswordFields();
-	resultMessage.innerHTML = selectedRoom + " " + xmlHttp.responseText;
+    resultMessage.style.display = "block";
+    resultMap.style.display = "block";
+    resultMessage.innerHTML = selectedRoom;
+    resultMap.innerHTML = xmlHttp.responseText;
 }
 
 function hideRoomList() {
     roomNamesContainer.innerHTML = '';
-    roomNamesContainer.style.visibility = false;
+    roomNamesContainer.style.display = "none";
 }
 
 function showUsernamePasswordFields() {
@@ -247,12 +254,11 @@ function showUsernamePasswordFields() {
     userpassHTML += "<input  type='password' id='passwordInput' class='form-control userNamePswdInputText' placeholder='Password'></input>";
     userpassHTML += "<button class='btn btn-default reserveButton form-control' type='button' onclick='handleReserveBtnClick()' >Reserve</button>";
 
-    usernamePasswordContainer.style.visibility = true;
+    usernamePasswordContainer.style.display = "block";
     usernamePasswordContainer.innerHTML = userpassHTML;
 }
 
 function hideUsernamePasswordFields() {
-    usernamePasswordContainer.style.visibility = false;
-    usernamePasswordContainer.innerHTML = "";
+    usernamePasswordContainer.style.display = "none";
 }
 

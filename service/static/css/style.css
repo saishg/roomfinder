@@ -191,3 +191,9 @@ hr {
 
     box-shadow: 1px 0px 1px 1px #888888;
 }
+
+.mapContainer {
+    margin: 5px 0px 0px 40px;
+    display: none;
+    height: 400px;
+}

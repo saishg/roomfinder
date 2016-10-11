@@ -2,10 +2,13 @@
 Webservice APIs for room finder backend
 """
 
+import base64
 import collections
 import json
 import os
+import pipes
 import socket
+import subprocess
 
 import common
 import flask
@@ -19,6 +22,11 @@ APP = flask.Flask(__name__, template_folder=common.TEMPLATE_FOLDER)
 def index():
     """ Serve static index file """
     return flask.render_template('index.html')
+
+@APP.route('/getfloormap', methods=['GET'])
+def get_floor_map():
+    bldgfloorname = flask.request.args.get('bldgfloorname')
+    return flask.send_file(os.path.join(common.FLOORMAP_DIR, bldgfloorname))
 
 QueryParam = collections.namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees, timezone')
 BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password, timezone')
@@ -112,7 +120,13 @@ def book_room():
         if room_finder.reserve_room():
             common.LOGGER.warning("User %s reservation of %s succeeded",
                                   queryparam.user, queryparam.roomname)
-            return "reservation requested"
+	    bldg, floor, unused = queryparam.roomname.split('-', 2)
+	    URL = "https://wwwin.cisco.com/c/dam/cec/organizations/gbs/wpr/FloorPlans/{}-AFP-{}.pdf".format(bldg, floor)
+            curl_command = "curl --location-trusted -L --ntlm -c cookies.txt -u " + pipes.quote(queryparam.user) + ":" + pipes.quote(base64.b64decode(queryparam.password)) + " " + URL + " -o " + common.FLOORMAP_DIR + "/{}-AFP-{}.pdf".format(bldg, floor)
+	    curl_process = subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+	    response = curl_process.communicate()[0]
+	    common.LOGGER.warning("Floor map for building %s floor %s downloaded", bldg, floor)
+	    return "Reservation Requested </br> </br> </br> <iframe src=getfloormap?bldgfloorname={}-AFP-{}.pdf  width='90%' height='70%'></iframe>".format(bldg, floor)
         else:
             common.LOGGER.warning("User %s reservation of %s failed",
                                   queryparam.user, queryparam.roomname)
