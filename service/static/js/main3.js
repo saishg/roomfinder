@@ -29,6 +29,10 @@ function init(){
     loadFloorList(buildingSelect.value);
     floorSelect.value = "3";
 
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(getCity);
+    }
+
     setTodayDate();
     createTimeRows(times);
 
