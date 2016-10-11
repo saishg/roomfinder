@@ -159,7 +159,6 @@ function loadRooms(queryString) {
 
 function showFreeRooms(rooms_json) {
     error = rooms_json["Error"];
-    console.log(error);
     if (typeof error != "undefined") {
         mytable.innerHTML += "<td>Error: " + error + "</td>";
         return;
