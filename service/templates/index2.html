@@ -110,13 +110,15 @@
         </td>
     </tr>
     <tr>
-        <td>
+        <td colspan="2">
             <label id="dateLabel">Date</label> <br/>
-            <input type="date" style="width:175%" id="bookDate"/>
+            <button id="prev" onclick="prevDate()">&lt;</button>
+            <input type="date" style="width:60%" id="bookDate"/>
+            <button id="next" onclick="nextDate()">&gt;</button>
         </td>
     </tr>
     <tr>
-        <td rowspan="2">
+        <td>
             <label id="startTimeLabel">Time</label> <br/>
             <select id="startTimeHourSelect"></select>
             <select id="startTimeMinSelect"></select>

@@ -25,7 +25,7 @@ class AvailRoomFinder(object):
     """ Class to query an Exchange Server for availability status of rooms """
 
     def __init__(self, user, password,
-                 start_time=common.TIME_NOW, duration='1h',
+                 start_time=common.TIME_NOW, duration=None, end_time=None,
                  filename=common.ROOMS_CSV, timezone=common.SJ_TIME_ZONE):
         self.rooms = common.read_room_list(filename)
         self.user = user
@@ -34,7 +34,10 @@ class AvailRoomFinder(object):
         self.timezone = timezone or common.SJ_TIME_ZONE
         self.error = None
         self.exchange_api = ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
-        self.end_time = common.end_time(self.start_time, duration)
+        if end_time is None:
+            self.end_time = common.end_time(self.start_time, duration)
+        if duration is None:
+            self.end_time = end_time
 
     def search_free(self, prefix, min_size=1):
         """ Look for available rooms from the list of selected rooms """
