@@ -124,7 +124,7 @@ function handleTime(index) {
     for (var i=0 ; i<times.length; i++) {
         btn = eval('timeBtn'+i);
         lbl = eval('timeLbl'+i);
-        if (i>= startTimeIndex && i<=endTimeIndex) {
+        if (i >= startTimeIndex && i <= endTimeIndex) {
             btn.classList.add('tableBtnEnabled');
             lbl.classList.add('timeLabelEnabled');
         }
@@ -133,7 +133,6 @@ function handleTime(index) {
             lbl.classList.remove('timeLabelEnabled');
         }
     }
-
 }
 
 function selectCurrentTime() {
@@ -141,11 +140,15 @@ function selectCurrentTime() {
     var current_hour = date.getHours();
     var current_min = date.getMinutes();
 
-    if (current_min < 30) {
+    if (current_min < 15) {
         current_min = "00";
     }
-    else {
+    else if (current_min < 45) {
         current_min = "30";
+    }
+    else {
+        current_hour++;
+        current_min = "00";
     }
 
     if (current_hour < 10) {
@@ -160,9 +163,10 @@ function selectCurrentTime() {
     for (var i=0 ; i<times.length; i++) {
         if (times[i] == selectTime) {
             handleTime(i);
+            eval("timeLbl" + i).scrollIntoView(true);
+            break;
         }
     }
-
 }
 
 function setTodayDate() {
