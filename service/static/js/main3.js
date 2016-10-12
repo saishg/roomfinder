@@ -42,12 +42,13 @@ function init(){
 
     setTodayDate();
     createTimeRows(times);
+    selectCurrentTime();
 }
 
 function createCombo(container, data) {
     var options = '';
     container.options.length = 0;
-    for (var i = 0; i < data.length; i++) {
+    for (var i=0; i < data.length; i++) {
         container.options.add(new Option(data[i], data[i]));
     }
 }
@@ -122,10 +123,10 @@ function handleTime(index) {
 
     var btn;
     var lbl;
-    for(var i=0 ; i<times.length ;i++) {
+    for (var i=0 ; i<times.length; i++) {
         btn = eval('timeBtn'+i);
         lbl = eval('timeLbl'+i);
-        if (i>= startTimeIndex && i<=endTimeIndex) {
+        if (i >= startTimeIndex && i <= endTimeIndex) {
             btn.classList.add('tableBtnEnabled');
             lbl.classList.add('timeLabelEnabled');
         }
@@ -134,7 +135,40 @@ function handleTime(index) {
             lbl.classList.remove('timeLabelEnabled');
         }
     }
+}
 
+function selectCurrentTime() {
+    var date = new Date();
+    var current_hour = date.getHours();
+    var current_min = date.getMinutes();
+
+    if (current_min < 15) {
+        current_min = "00";
+    }
+    else if (current_min < 45) {
+        current_min = "30";
+    }
+    else {
+        current_hour++;
+        current_min = "00";
+    }
+
+    if (current_hour < 10) {
+        current_hour = "0" + current_hour;
+    }
+    else {
+        current_hour = "" + current_hour;
+    }
+
+    var selectTime = current_hour + ":" + current_min;
+
+    for (var i=0 ; i<times.length; i++) {
+        if (times[i] == selectTime) {
+            handleTime(i);
+            eval("timeLbl" + i).scrollIntoView(true);
+            break;
+        }
+    }
 }
 
 function setTodayDate() {
