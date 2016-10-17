@@ -21,15 +21,15 @@ APP = flask.Flask(__name__, template_folder=common.TEMPLATE_FOLDER)
 @APP.route('/')
 def index():
     """ Serve static index file """
-    return flask.render_template('index.html')
+    return flask.render_template('index3.html')
 
 @APP.route('/getfloormap', methods=['GET'])
 def get_floor_map():
     bldgfloorname = flask.request.args.get('bldgfloorname')
     return flask.send_file(os.path.join(common.FLOORMAP_DIR, bldgfloorname))
 
-QueryParam = collections.namedtuple('QueryParam', 'buildingname, floor, starttime, duration, user, password, attendees, timezone')
-BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, roomemail, starttime, duration, user, password, timezone')
+QueryParam = collections.namedtuple('QueryParam', 'buildingname, floor, date, starttime, endtime, user, password, attendees, timezone')
+BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, date, starttime, endtime, user, password, timezone')
 
 @APP.route('/getcity', methods=['GET'])
 def get_city():
@@ -74,8 +74,9 @@ def show_rooms():
     """ Serve list of rooms in JSON """
     queryparam = QueryParam(buildingname=flask.request.args.get('buildingname'),
                             floor=flask.request.args.get('floor'),
+                            date=flask.request.args.get('date'),
                             starttime=flask.request.args.get('starttime'),
-                            duration=flask.request.args.get('duration'),
+                            endtime=flask.request.args.get('endtime'),
                             user=flask.request.args.get('user'),
                             password=flask.request.args.get('password'),
                             attendees=flask.request.args.get('attendees'),
@@ -89,8 +90,8 @@ def show_rooms():
     try:
         room_finder = AvailRoomFinder(user=queryparam.user,
                                       password=queryparam.password,
-                                      start_time=queryparam.starttime,
-                                      duration=queryparam.duration,
+                                      start_time=queryparam.date + "T" + queryparam.starttime + ":00",
+                                      end_time=queryparam.date + "T" + queryparam.endtime + ":00",
                                       timezone=queryparam.timezone)
         rooms_info = room_finder.search_free(prefix, min_size=int(queryparam.attendees))
     except Exception as exception:
@@ -103,30 +104,30 @@ def show_rooms():
 def book_room():
     """ Reserve specified room """
     queryparam = BookRoomQueryParam(roomname=flask.request.args.get('roomname'),
-                                    roomemail=flask.request.args.get('roomemail'),
+                                    date=flask.request.args.get('date'),
                                     starttime=flask.request.args.get('starttime'),
-                                    duration=flask.request.args.get('duration'),
+                                    endtime=flask.request.args.get('endtime'),
                                     user=flask.request.args.get('user'),
                                     password=flask.request.args.get('password'),
                                     timezone=flask.request.args.get('timezone'))
+
     room_finder = ReserveAvailRoom(user=queryparam.user,
                                    password=queryparam.password,
                                    roomname=queryparam.roomname,
-                                   roomemail=queryparam.roomemail,
-                                   start_time=queryparam.starttime,
-                                   duration=queryparam.duration,
+                                   start_time=queryparam.date + "T" + queryparam.starttime + ":00",
+                                   end_time=queryparam.date + "T" + queryparam.endtime + ":00",
                                    timezone=queryparam.timezone)
     try:
         if room_finder.reserve_room():
             common.LOGGER.warning("User %s reservation of %s succeeded",
                                   queryparam.user, queryparam.roomname)
-	    bldg, floor, unused = queryparam.roomname.split('-', 2)
-	    URL = "https://wwwin.cisco.com/c/dam/cec/organizations/gbs/wpr/FloorPlans/{}-AFP-{}.pdf".format(bldg, floor)
+            bldg, floor, unused = queryparam.roomname.split('-', 2)
+            URL = "https://wwwin.cisco.com/c/dam/cec/organizations/gbs/wpr/FloorPlans/{}-AFP-{}.pdf".format(bldg, floor)
             curl_command = "curl --location-trusted -L --ntlm -c cookies.txt -u " + pipes.quote(queryparam.user) + ":" + pipes.quote(base64.b64decode(queryparam.password)) + " " + URL + " -o " + common.FLOORMAP_DIR + "/{}-AFP-{}.pdf".format(bldg, floor)
-	    curl_process = subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-	    response = curl_process.communicate()[0]
-	    common.LOGGER.warning("Floor map for building %s floor %s downloaded", bldg, floor)
-	    return "Reservation Requested </br> </br> </br> <iframe src=getfloormap?bldgfloorname={}-AFP-{}.pdf  width='90%' height='70%'></iframe>".format(bldg, floor)
+            curl_process = subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            response = curl_process.communicate()[0]
+            common.LOGGER.warning("Floor map for building %s floor %s downloaded", bldg, floor)
+            return "Reservation Requested </br> </br> </br> <iframe src=getfloormap?bldgfloorname={}-AFP-{}.pdf  width='100%' height='100%'></iframe>".format(bldg, floor)
         else:
             common.LOGGER.warning("User %s reservation of %s failed",
                                   queryparam.user, queryparam.roomname)
