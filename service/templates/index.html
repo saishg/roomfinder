@@ -1,137 +1,60 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <script type="text/javascript" src="static/js/main.js"></script>
-    <style>
-        body {
-            background-color: #e6ecff;
-            color: #555555;
-            font-family: "Verdana","Calibri",Geneva,sans-serif;
-        }
-        #contact{
-            color: black;
-            font-size: 10px;
-            text-align: right;
-        }
-        #search{
-            color: black;
-            font-size: 15px;
-            text-align: center;
-        }
-        #result{
-            color: black;
-            font-size: 15px;
-            text-align: center;
-        }
-        #banner{
-            background-color: #AAAAAA;
-            color: white;
-            font-size: 60px;
-            padding: 10px;
-            border-left: 10px solid orange;
-            border-radius: 5px;
-            text-align: center;
-        }
-        label{
-            display: inline-block;
-            text-align: left;
-            margin-top: 15px;
-            margin-bottom: 3px;
-        }
-        input{
-            width: 130px;
-            height: 25px;
-        }
-        #userLabel{
-            width: 130px;
-        }
-        #passwordLabel{
-            width: 130px;
-            margin-left: 5px;
-        }
-        #passwordInput{
-            margin-left: 5px;
-        }
-        #buildingSelect{
-            margin-left: 3px;
-        }
-        #floorLabel{
-            margin-left: 25px;
-        }
-        #floorSelect{
-            margin-left: 3px;
-        }
-        #roomSizeLabel{
-            margin-left: 25px;
-        }
-        #roomSizeSelect{
-            margin-left: 3px;
-        }
-        #startTimeHourSelect{
-            margin-left: 3px;
-        }
-        #durationLabel{
-            margin-left: 25px;
-        }
-        #durationHourSelect{
-            margin-left: 3px;
-        }
-        #submitButton{
-            margin-top: 30px;
-            margin-left: 1px;
-            height: 30px;
-            font-family: "Verdana","Calibri",Geneva,sans-serif;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        fieldset{
-            border: none;
-            width: 650px;
-            margin: 0px auto;
-        }
-        #mytable{
-            margin: auto;
-            margin-top: 30px;
-            width: 650px;
-        }
-        td{
-            padding: 5px;
-        }
-    </style>
+    <title>Room finder</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="static/js/main3.js"></script>
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body onload="init()">
-<div id="optionContainer">
-    <div id="banner">Conference Room Finder</div>
-    <div id="contact">
-        <a href="mailto:roomfinder@cisco.com">Report a bug</a> &nbsp; &nbsp; &nbsp;
-        <a href="mailto:sgersapp@cisco.com">Contact Us</a> &nbsp; &nbsp; &nbsp;
-    <div>
-    <br/>
-    <div id="search">
-        <fieldset>
-        <label id="cityLabel">City</label> <select id="citySelect" onchange="loadBuildingList(this.value)"></select>
-        <label id="buildingLabel">Building</label> <select id="buildingSelect" onchange="loadFloorList(this.value)"></select>
-        <label id="floorLabel">Floor</label> <select id="floorSelect"></select>
-        <label id="roomSizeLabel">Attendees</label> <select id="roomSizeSelect"></select><br/>
-        <label id="dateLabel">Date</label> <input type="date" id="bookDate"/>
-        <label id="startTimeLabel">Time</label>
-            <select id="startTimeHourSelect"></select>
-            <select id="startTimeMinSelect"></select>
-        <label id="durationLabel">Duration</label>
-            <select id="durationHourSelect"></select>
-            <select id="durationMinSelect"></select><br/>
-        <button id="submitButton" onclick="submitClickHandler()">Search for free rooms</button><br/><br/>
-        <label id="userLabel">Username</label><input type="text" id="userNameInput"></input>
-        <label id="passwordLabel">Password</label><input type="password" id="passwordInput"></input>
-        </fieldset>
+
+<div>
+    <div class="titleContainer">
+        <h2 class="titleText">Conference Room Finder</h2>
+    </div>
+    <div class="leftAndRightDivContainer">
+        <div class="form-group tableRow">
+            <div class="leftDiv">
+                <div>
+                    <label class="cityLabel">City</label>
+                    <label class="attendeesLabel">Attendees</label>
+                </div>
+                <div>
+                    <select id="citySelect" class="form-control selectStyle" onchange="loadBuildingList(this.value)"></select>
+                    <select id="roomSizeSelect" class="form-control selectStyle"></select>
+                </div>
+                <div>
+                    <label class="buildingLabel">Building</label>
+                    <label class="floorLabel">Floor</label>
+                </div>
+                <div class="buildingFloorSelectContainer">
+                    <select id="buildingSelect" class="form-control selectStyle" onchange="loadFloorList(this.value)"></select>
+                    <select id="floorSelect" class="form-control selectStyle"></select>
+                </div>
+                <div class="dateContainer">
+                    <label class="dateText">Date</label>
+                    <input id="dateInput" type="date" class="form-control dateInput" />
+                </div>
+                <label class="timeText">Time</label>
+                <hr>
+                <div id="tableContainer" class="tableContainer" > </div>
+
+                <button class="btn btn-default searchButton form-control" type="button" onclick="handleSearchBtnClick()" >Search</button>
+            </div>
+
+            <div class="rightDiv">
+                <div id="resultMessage" class="roomNamesRow" ></div>
+	    	<div id="resultMap" class="mapContainer" ></div>
+                <div id="roomNamesContainer"></div>
+                <div id="usernamePasswordContainer"></div>
+                <!-- <div><h4 class="userNamePswdLbl">Site Map</h4></div> -->
+            </div>
+        </div>
     </div>
 </div>
 
-
-<table id="mytable">
-</table>
-
-<div id="result">
-</div>
 </body>
 </html>
