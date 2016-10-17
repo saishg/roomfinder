@@ -21,7 +21,7 @@ APP = flask.Flask(__name__, template_folder=common.TEMPLATE_FOLDER)
 @APP.route('/')
 def index():
     """ Serve static index file """
-    return flask.render_template('index3.html')
+    return flask.render_template('index.html')
 
 @APP.route('/getfloormap', methods=['GET'])
 def get_floor_map():
