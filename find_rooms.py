@@ -30,9 +30,18 @@ class RoomFinder(object):
     def _search(self, prefix):
         return self.exchange_api.find_rooms(prefix=prefix)
 
+    def _search_to_be_deleted(self, prefix, newrooms):
+        to_be_deleted = []
+        for room in self.rooms:
+            if room not in newrooms and room.startswith(prefix):
+                to_be_deleted.append(room)
+                print "--", room
+        return to_be_deleted
+
     def search(self, prefix, deep=False):
         """ Search for rooms with names starting with specified prefix """
         rooms_found = self._search(prefix)
+        to_be_deleted = self._search_to_be_deleted(prefix, rooms_found)
 
         if deep:
             symbols = string.letters + string.digits
@@ -42,6 +51,9 @@ class RoomFinder(object):
 
         common.LOGGER.info("Search for prefix '%s' yielded %d rooms.", prefix, len(rooms_found))
         self.rooms.update(rooms_found)
+        for room in to_be_deleted:
+            common.LOGGER.info("Deleting room '%s' room for prefix '%s'.", room, prefix)
+            del self.rooms[room]
 
     def dump(self):
         """ Dump the results to specified file """
