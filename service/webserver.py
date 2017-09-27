@@ -15,6 +15,7 @@ import flask
 
 from book_room import ReserveAvailRoom
 from find_available_room import AvailRoomFinder
+from room_status import RoomStatus
 
 APP = flask.Flask(__name__, template_folder=common.TEMPLATE_FOLDER)
 
@@ -29,6 +30,7 @@ def get_floor_map():
     return flask.send_file(os.path.join(common.FLOORMAP_DIR, bldgfloorname))
 
 QueryParam = collections.namedtuple('QueryParam', 'buildingname, floor, date, starttime, endtime, user, password, attendees, timezone')
+RoomStatusQueryParam = collections.namedtuple('QueryParam', 'roomemail')
 BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, date, starttime, endtime, user, password, timezone')
 
 @APP.route('/getcity', methods=['GET'])
@@ -68,7 +70,18 @@ def show_floors():
         return json.dumps(floors)
 
 # Example Query
-# http://127.0.0.1:5000/showrooms?building_floor_name=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password
+# http://127.0.0.1/showrooms?room_email=a@a.com
+@APP.route('/roomstatus', methods=['GET'])
+def room_status():
+    """ Checks if room is free for next 15 mins """
+    queryparam = RoomStatusQueryParam(roomemail=flask.request.args.get('roomemail'))
+    room = RoomStatus()
+    status = room.status(queryparam.roomemail)
+    return json.dumps(status)
+
+
+# Example Query
+# http://127.0.0.1/showrooms?building_floor_name=ABC&starttime=2016-08-25T09:00:00-13:00&duration=1h&user=USER&password=password
 @APP.route('/showrooms', methods=['GET'])
 def show_rooms():
     """ Serve list of rooms in JSON """
