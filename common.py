@@ -26,7 +26,6 @@ COORDS_CACHE = {}
 BUILDINGS_CACHE = {}
 FLOORS_CACHE = {}
 
-TIME_NOW = datetime.datetime.now().replace(microsecond=0).isoformat()
 SJ_TIME_ZONE = "420"
 
 logging.basicConfig(filename='access.log',
@@ -36,6 +35,8 @@ logging.basicConfig(filename='access.log',
 LOGGER = logging.getLogger('roomfinder')
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
+def time_now():
+    return datetime.datetime.now().replace(microsecond=0).isoformat()
 
 def end_time(start_time, duration):
     """ Calculate end time, given start time and duration """

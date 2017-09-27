@@ -21,7 +21,7 @@ class ReserveAvailRoom(object):
 
     def __init__(self, user, password,
                  roomname, roomemail=None,
-                 start_time=common.TIME_NOW, duration=None, end_time=None,
+                 start_time=common.time_now(), duration=None, end_time=None,
                  raw_password=None,
                  timezone=common.SJ_TIME_ZONE):
         self.user = user
@@ -65,7 +65,7 @@ def run():
     parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
     parser.add_argument("-start", "--starttime",
                         help="Starttime e.g. 2014-07-02T11:00:00 (default = now)",
-                        default=common.TIME_NOW)
+                        default=common.time_now())
     parser.add_argument("-d", "--duration",
                         help="Duration e.g. 30m (default = 1h)",
                         default='1h')

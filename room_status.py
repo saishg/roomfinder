@@ -21,7 +21,7 @@ class RoomStatus(object):
     """ Class to query an Exchange Server for status of specified room """
 
     def __init__(self):
-        self.start_time = common.TIME_NOW
+        self.start_time = common.time_now()
         self.end_time = common.end_time(self.start_time, "15m")
         self.room_info = {}
         self.timezone = common.SJ_TIME_ZONE
