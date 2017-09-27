@@ -100,6 +100,7 @@ class ExchangeApi(object):
             RESERVE_XML = self._read_template("reserve_resource_template.xml")
 
         user_email = self.user + '@' + self.domain
+        room_name = room_name.replace("'", "") # Quotes cause all sorts of errors
         meeting_body = '{0} booked via RoomFinder by {1}'.format(room_name, user_email)
         subject = 'RoomFinder: {0}'.format(room_name)
 
