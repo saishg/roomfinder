@@ -23,14 +23,13 @@ TABLE_HEADER = SEPARATOR + TABLE_FORMAT.format("Status", "Room", "Email") + SEPA
 class RoomStatus(object):
     """ Class to query an Exchange Server for status of specified room """
 
-    def __init__(self, user, password):
-        self.user = user
+    def __init__(self):
         self.start_time = common.TIME_NOW
         self.end_time = common.end_time(self.start_time, "15m")
         self.room_info = {}
         self.timezone = common.SJ_TIME_ZONE
         self.error = None
-        self.exchange_api = ExchangeApi(user, base64.b64decode(urllib.unquote(password)))
+        self.exchange_api = ExchangeApi('', '')
 
     def status(self, room_email):
         common.LOGGER.debug("Querying for %s", room_email)
@@ -57,17 +56,11 @@ class RoomStatus(object):
 def run():
     """ Parse command-line arguments and invoke room availability finder """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
     parser.add_argument("-r", "--roomemail", help="e-mail address of the room", required=True)
 
     args = parser.parse_args()
-    if args.user == 'anon':
-        args.password = ''
-    else:
-        args.password = base64.b64encode(getpass.getpass("Password:"))
-    room_finder = RoomStatus(user=args.user, password=args.password)
-
-    print room_finder.status(args.roomemail)
+    room = RoomStatus()
+    print room.status(args.roomemail)
 
 
 if __name__ == '__main__':
