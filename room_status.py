@@ -34,8 +34,8 @@ class RoomStatus(object):
         try:
             if '@' not in room_email:
                 room_info = self.exchange_api.find_rooms(prefix=room_email)
-                if not room_info:
-                    raise Exception("No room with that name")
+                if len(room_info) != 1:
+                    raise Exception('No room with that name')
                 room_email = room_info.keys()[0]["email"]
 
             room_info = self.exchange_api.room_status( \
@@ -44,11 +44,14 @@ class RoomStatus(object):
                                 end_time=self.end_time,
                                 timezone_offset=self.timezone)
 
+            if not room_info.get('freebusy'):
+                raise Exception('Room not found')
+
             return room_info
         except Exception as exception:
             self.error = exception
-            common.LOGGER.warning("Exception querying room %s: %s", room_email, str(exception))
-            return {}
+            common.LOGGER.warning("Exception querying room %s: %s", room_email, exception.message)
+            return {'error': exception.message}
 
 def run():
     """ Parse command-line arguments and invoke room availability finder """
