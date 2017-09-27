@@ -5,10 +5,7 @@ APIs to query an Exchange Server for availability status of rooms
 """
 
 import argparse
-import base64
-import getpass
 import sys
-import urllib
 
 import common
 from exchange_api import ExchangeApi
