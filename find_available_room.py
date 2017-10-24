@@ -12,6 +12,7 @@ import threading
 import urllib
 
 import common
+from operator import add
 from exchange_api import ExchangeApi
 
 reload(sys)
@@ -56,7 +57,18 @@ class AvailRoomFinder(object):
 
     def search_common_free(self, emails):
         """ Look for common free times for selected emails """
-        return self.search(emails)
+        def clean_free_busy(schedule):
+            freebusy = list(schedule['freebusy'])
+            return map(lambda x: int(int(x) > 0) * 100, freebusy)
+
+        schedules = self.search(emails).values()
+        all_freebusy = map(clean_free_busy, schedules)
+        valid_freebusy = filter(lambda x: len(x) > 1, all_freebusy)
+        combined_freebusy = map(add, *valid_freebusy)
+
+        N = len(valid_freebusy)
+        percent_combined_freebusy = map(lambda x: x/N, combined_freebusy)
+        return percent_combined_freebusy
 
     def _query(self, roomname):
         if '@' not in roomname:

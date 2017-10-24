@@ -130,8 +130,8 @@ def show_schedule():
                                       timezone=timezone)
         rooms_info = room_finder.search_common_free(emails)
     except Exception as exception:
-        common.LOGGER.warning("User %s query resulted in an error: %s",
-                              queryparam.user, str(exception))
+        common.LOGGER.warning("Query for emails %s resulted in an error: %s",
+                              ', '.join(emails), str(exception))
         rooms_info = {"Error" : str(exception)}
     return json.dumps(rooms_info)
 
