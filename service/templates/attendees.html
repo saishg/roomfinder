@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Room finder</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="static/js/attendees.js"></script>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body onload="init()">
+
+<div>
+    <div class="titleContainer">
+        <h2 class="titleText">Schedule Attendees</h2>
+    </div>
+    <div class="leftAndRightDivContainer">
+        <div class="form-group tableRow">
+            <div class="leftDiv">
+                <div>
+                    <label class="attendeesListLabel">Attendees</label>
+                    <input type="text" id="attendeesList" value="" />
+                </div>
+                <div class="dateContainer">
+                    <label class="dateText">Date</label>
+                    <input id="dateInput" type="date" class="form-control dateInput" />
+                </div>
+                <button class="btn btn-default searchButton form-control" type="button" onclick="handleSearchBtnClick()" >Search</button>
+            </div>
+            <div class="rightDiv">
+                <div id="resultMessage" class="roomNamesRow" ></div>
+	    	<div id="resultMap" class="mapContainer" ></div>
+                <div id="roomNamesContainer"></div>
+                <div id="usernamePasswordContainer"></div>
+                <!-- <div><h4 class="userNamePswdLbl">Site Map</h4></div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
