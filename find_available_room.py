@@ -54,10 +54,19 @@ class AvailRoomFinder(object):
                 free_room_info[roomname] = selected_room_info[roomname]
         return free_room_info
 
+    def search_common_free(self, emails):
+        """ Look for common free times for selected emails """
+        return self.search(emails)
+
     def _query(self, roomname):
-        room_size = self.rooms[roomname]["size"]
-        email = self.rooms[roomname]["email"]
-        common.LOGGER.debug("Querying for %s", roomname)
+        if '@' not in roomname:
+            room_size = self.rooms[roomname]["size"]
+            email = self.rooms[roomname]["email"]
+            common.LOGGER.debug("Querying for room %s", roomname)
+        else:
+            room_size = 0
+            email = roomname
+            common.LOGGER.debug("Querying for email %s", roomname)
 
         try:
             room_info = self.exchange_api.room_status( \
@@ -108,10 +117,10 @@ class AvailRoomFinder(object):
 def run():
     """ Parse command-line arguments and invoke room availability finder """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", "--user", help="user name for exchange/outlook", required=True)
+    parser.add_argument("-u", "--user", help="user name for exchange/outlook")
     parser.add_argument("-prefix", "--prefix",
                         help="A prefix to search for. e.g. 'SJC19- SJC18-'",
-                        default='')
+                        default='SJC19-2-')
     parser.add_argument("-start", "--starttime",
                         help="Starttime e.g. 2014-07-02T11:00:00 (default = now)",
                         default=common.time_now())
@@ -123,12 +132,18 @@ def run():
                         default=common.ROOMS_CSV)
 
     args = parser.parse_args()
-    args.password = base64.b64encode(getpass.getpass("Password:"))
+
+    if args.user:
+        args.password = base64.b64encode(getpass.getpass("Password:"))
+    else:
+        args.user = 'anon'
+        args.password = ''
 
     room_finder = AvailRoomFinder(user=args.user, password=args.password,
                                   start_time=args.starttime, duration=args.duration,
                                   filename=args.file)
-    room_finder.search_free(prefix=args.prefix)
+#    print room_finder.search_free(prefix=args.prefix)
+    print room_finder.search_common_free(['sgersapp@cisco.com', 'ratri@cisco.com'])
 
 
 if __name__ == '__main__':

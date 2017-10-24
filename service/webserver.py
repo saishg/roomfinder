@@ -70,7 +70,7 @@ def show_floors():
         return json.dumps(floors)
 
 # Example Query
-# http://127.0.0.1/showrooms?room_email=a@a.com
+# http://127.0.0.1/roomstatus?room_email=a@a.com
 @APP.route('/roomstatus', methods=['GET'])
 def room_status():
     """ Checks if room is free for next 15 mins """
@@ -112,6 +112,30 @@ def show_rooms():
                               queryparam.user, str(exception))
         rooms_info = {"Error" : str(exception)}
     return json.dumps(rooms_info)
+
+# Example Query
+# http://127.0.0.1/schedule?emails=a@a.com,b@b.com&date=2016-08-25&timezone=420
+@APP.route('/schedule', methods=['GET'])
+def show_schedule():
+    """ Serve schedule of users in JSON """
+    date = date=flask.request.args.get('date')
+    emails = flask.request.args.get('emails').split(',')
+    timezone = flask.request.args.get('timezone')
+
+    try:
+        room_finder = AvailRoomFinder(user='anon',
+                                      password='',
+                                      start_time=date + "T00:00:00",
+                                      end_time=date + "T23:59:59",
+                                      timezone=timezone)
+        rooms_info = room_finder.search_common_free(emails)
+    except Exception as exception:
+        common.LOGGER.warning("User %s query resulted in an error: %s",
+                              queryparam.user, str(exception))
+        rooms_info = {"Error" : str(exception)}
+    return json.dumps(rooms_info)
+
+
 
 @APP.route('/bookroom', methods=['GET'])
 def book_room():
