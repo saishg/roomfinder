@@ -55,12 +55,18 @@ class AvailRoomFinder(object):
         return free_room_info
 
     def search_common_free(self, emails):
-        pass
+        """ Look for common free times for selected emails """
+        return self.search(emails)
 
     def _query(self, roomname):
-        room_size = self.rooms[roomname]["size"]
-        email = self.rooms[roomname]["email"]
-        common.LOGGER.debug("Querying for %s", roomname)
+        if '@' not in roomname:
+            room_size = self.rooms[roomname]["size"]
+            email = self.rooms[roomname]["email"]
+            common.LOGGER.debug("Querying for room %s", roomname)
+        else:
+            room_size = 0
+            email = roomname
+            common.LOGGER.debug("Querying for email %s", roomname)
 
         try:
             room_info = self.exchange_api.room_status( \
@@ -136,7 +142,8 @@ def run():
     room_finder = AvailRoomFinder(user=args.user, password=args.password,
                                   start_time=args.starttime, duration=args.duration,
                                   filename=args.file)
-    print room_finder.search_free(prefix=args.prefix)
+#    print room_finder.search_free(prefix=args.prefix)
+    print room_finder.search_common_free(['sgersapp@cisco.com', 'ratri@cisco.com'])
 
 
 if __name__ == '__main__':
