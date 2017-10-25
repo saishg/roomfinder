@@ -77,9 +77,9 @@ function wrap_row(cells) {
     return '<tr>' + cells + '</tr>';
 }
 
-function wrap_cell(data='', h=0, color='#ff00000'){
+function wrap_cell(data='', h=0, color='#ff00000', index=0){
     if (!h){
-        return '<td height="20px" style="background-color:' + color + '">' + data + '</td>';
+        return '<td onmouseout="hide_box('+index.toString()+ ')" onmouseover="free_list('+ index.toString() +' )" height="20px" style="background-color:' + color + '">' + '<span id=' + index.toString() + ' class="hoverbox"></span>'+'</td>';
     } else {
         return '<th>' + data + '</th>';
     }
@@ -97,7 +97,31 @@ function get_color(factor){
     }
 }
 
-function gen_html(avail){
+var busy_info = [];
+function free_list(index){
+    var i;
+    var free_attendees = [];
+    for (i in busy_info){
+        if (busy_info[i]["freebusy"][index] == '1'){
+            free_attendees.push(busy_info[i]["name"]);
+        }
+    }
+    var display_names = "";
+    for (i in free_attendees){
+        display_names += free_attendees[i] + "</br>";
+    }
+    document.getElementById(index.toString()).style.display = "block";
+    var x = document.getElementById(index.toString())
+    x.innerHTML = display_names;
+}
+
+function hide_box(index){
+    document.getElementById(index).style.display = "none";
+}
+
+function gen_html(attendees_info){
+    busy_info = attendees_info[1];
+    avail = attendees_info[0];
     var inner_html = '<table border=1>';
     var hrs = [9,10,11,12,13,14,15,16];
     var mins = [":00", ":15", ":30", ":45"];
@@ -112,7 +136,7 @@ function gen_html(avail){
 
     cells = "";
     for (slot in avail){
-        cells += wrap_cell('', 0, get_color(avail[slot]));
+        cells += wrap_cell('', 0, get_color(avail[slot]), slot);
     }
     inner_html += wrap_row(cells);
 
