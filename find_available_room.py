@@ -67,7 +67,7 @@ class AvailRoomFinder(object):
         common.LOGGER.debug("all freebusy %s", all_freebusy)
         valid_freebusy = filter(lambda x: len(x) > 1, all_freebusy)
         common.LOGGER.debug("valid freebusy %s", valid_freebusy)
-        combined_freebusy = map(add, *valid_freebusy)
+        combined_freebusy = map(sum, zip(*valid_freebusy))
         common.LOGGER.debug("combined freebusy %s", combined_freebusy)
 
         N = len(valid_freebusy)
