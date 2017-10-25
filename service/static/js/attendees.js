@@ -3,14 +3,6 @@ function init(){
     setTodayDate();
 }
 
-function createCombo(container, data) {
-    var options = '';
-    container.options.length = 0;
-    for (var i=0; i < data.length; i++) {
-        container.options.add(new Option(data[i], data[i]));
-    }
-}
-
 function setTodayDate() {
     var today = new Date();
     var dd = today.getDate();
@@ -38,10 +30,12 @@ function loadRooms(queryString) {
     var xmlHttp = new XMLHttpRequest();
     url = "/schedule";
     url = url.concat(queryString);
+    console.log(url)
 
     xmlHttp.open("GET", url, false); // false for synchronous request
     xmlHttp.send(null);
     if (xmlHttp.responseText.trim() != "") {
+        console.log(xmlHttp.responseText)
         available_rooms = JSON.parse(xmlHttp.responseText);
         showFreeRooms(available_rooms);
     }
