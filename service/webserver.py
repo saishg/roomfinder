@@ -133,8 +133,8 @@ def show_schedule():
     try:
         room_finder = AvailRoomFinder(user='anon',
                                       password='',
-                                      start_time=date + "T00:00:00",
-                                      end_time=date + "T23:59:59",
+                                      start_time=date + "T09:00:00",
+                                      end_time=date + "T16:59:59",
                                       timezone=timezone)
         rooms_info = room_finder.search_common_free(emails)
     except Exception as exception:
