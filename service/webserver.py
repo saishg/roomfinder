@@ -128,6 +128,7 @@ def show_schedule():
     """ Serve schedule of users in JSON """
     date = date=flask.request.args.get('date')
     emails = flask.request.args.get('emails').split(',')
+    cisco_emails = [email+'@cisco.com' if not email.endswith('@cisco.com') else email for email in emails]
     timezone = flask.request.args.get('timezone')
 
     try:
@@ -136,10 +137,10 @@ def show_schedule():
                                       start_time=date + "T09:00:00",
                                       end_time=date + "T16:59:59",
                                       timezone=timezone)
-        rooms_info = room_finder.search_common_free(emails)
+        rooms_info = room_finder.search_common_free(cisco_emails)
     except Exception as exception:
         common.LOGGER.warning("Query for emails %s resulted in an error: %s",
-                              ', '.join(emails), str(exception))
+                              ', '.join(cisco_emails), str(exception))
         rooms_info = {"Error" : str(exception)}
     return json.dumps(rooms_info)
 
