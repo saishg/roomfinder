@@ -22,7 +22,8 @@ APP = flask.Flask(__name__, template_folder=common.TEMPLATE_FOLDER)
 @APP.route('/')
 def index():
     """ Serve static index file """
-    return flask.render_template('attendees.html')
+    return flask.render_template('index.html')
+
 
 @APP.route('/getfloormap', methods=['GET'])
 def get_floor_map():
@@ -32,6 +33,13 @@ def get_floor_map():
 QueryParam = collections.namedtuple('QueryParam', 'buildingname, floor, date, starttime, endtime, user, password, attendees, timezone')
 RoomStatusQueryParam = collections.namedtuple('QueryParam', 'roomemail')
 BookRoomQueryParam = collections.namedtuple('QueryParam', 'roomname, date, starttime, endtime, user, password, timezone')
+
+
+@APP.route('/attendees', methods=['GET'])
+def get_attendees():
+    """ Serve static index file """
+    return flask.render_template('attendees.html')
+
 
 @APP.route('/getcity', methods=['GET'])
 def get_city():
