@@ -59,16 +59,21 @@ class AvailRoomFinder(object):
         """ Look for common free times for selected emails """
         def clean_free_busy(schedule):
             freebusy = list(schedule['freebusy'])
-            return map(lambda x: int(int(x) > 0) * 100, freebusy)
+            return map(lambda x: int(int(x) == 0) * 100, freebusy)
 
         schedules = self.search(emails).values()
+        common.LOGGER.debug("Schedules %s", schedules)
         all_freebusy = map(clean_free_busy, schedules)
+        common.LOGGER.debug("all freebusy %s", all_freebusy)
         valid_freebusy = filter(lambda x: len(x) > 1, all_freebusy)
+        common.LOGGER.debug("valid freebusy %s", valid_freebusy)
         combined_freebusy = map(sum, zip(*valid_freebusy))
+        common.LOGGER.debug("combined freebusy %s", combined_freebusy)
 
         N = len(valid_freebusy)
         percent_combined_freebusy = map(lambda x: x/N, combined_freebusy)
-        return percent_combined_freebusy
+        common.LOGGER.debug("percent freebusy %s", percent_combined_freebusy)
+        return percent_combined_freebusy, schedules
 
     def _query(self, roomname):
         if '@' not in roomname:
