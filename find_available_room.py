@@ -64,7 +64,7 @@ class AvailRoomFinder(object):
         schedules = self.search(emails).values()
         all_freebusy = map(clean_free_busy, schedules)
         valid_freebusy = filter(lambda x: len(x) > 1, all_freebusy)
-        combined_freebusy = map(add, *valid_freebusy)
+        combined_freebusy = map(sum, zip(*valid_freebusy))
 
         N = len(valid_freebusy)
         percent_combined_freebusy = map(lambda x: x/N, combined_freebusy)
