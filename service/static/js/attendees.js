@@ -53,14 +53,7 @@ function showFreeRooms(rooms_json) {
     }
 
     roomNamesContainer.style.display = "block";
-    roomNamesContainer.innerHTML = '<label class="rightDivLbl" id="selectRoomText"> 1. Select A Room </label>';
-    roomNamesContainer.innerHTML += '<div class="roomNamesRow"><h4>' + Object.keys(rooms_json).length + ' room(s) available</h4></div>';
-    for (var key in rooms_json) {
-        var roomemail = rooms_json[key]["email"];
-        if (typeof roomemail != "undefined") {
-            roomNamesContainer.innerHTML += '<div class="roomNamesRow"><input type="radio" name="roomRadio" value="' + key + '" onclick="handleSelectRoomBtn(this)"><label class="roomNamesRadioLbl">' + key + '</label></div>';
-        }
-    }
+    roomNamesContainer.innerHTML = gen_html(rooms_json[0])
 }
 
 function handleSelectRoomBtn (radioBtn) {
