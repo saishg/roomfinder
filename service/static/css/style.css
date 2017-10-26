@@ -25,6 +25,18 @@ label {
     margin-left: 57%;
 }
 
+.hoverbox {
+    display: none;
+    background: rgba(255,255,0,0.5);
+    margin-left: 28px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1000;
+    width:120;
+    box-shadow: 5px 5px;
+}
+
+
 #citySelect,  #buildingSelect{
     width: 60%;
     background-color: lightgray;
