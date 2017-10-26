@@ -53,7 +53,7 @@ function showFreeRooms(rooms_json) {
     }
 
     roomNamesContainer.style.display = "block";
-    roomNamesContainer.innerHTML = gen_html(rooms_json[0])
+    roomNamesContainer.innerHTML = gen_html(rooms_json)
 }
 
 function handleSelectRoomBtn (radioBtn) {
@@ -95,7 +95,7 @@ function free_list(index){
     var i;
     var free_attendees = [];
     for (i in busy_info){
-        if (busy_info[i]["freebusy"][index] == '1'){
+        if (busy_info[i]["freebusy"][index] == '0'){
             free_attendees.push(busy_info[i]["name"]);
         }
     }
