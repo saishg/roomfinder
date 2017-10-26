@@ -36,6 +36,10 @@ label {
     box-shadow: 5px 5px;
 }
 
+#thickborder {
+    border: 2px solid black;
+}
+
 
 #citySelect,  #buildingSelect{
     width: 60%;

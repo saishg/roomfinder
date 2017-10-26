@@ -72,9 +72,9 @@ function wrap_row(cells) {
 
 function wrap_cell(data='', h=0, color='#ff00000', index=0){
     if (!h){
-        return '<td onmouseout="hide_box('+index.toString()+ ')" onmouseover="free_list('+ index.toString() +' )" height="20px" style="background-color:' + color + '">' + '<span id=' + index.toString() + ' class="hoverbox"></span>'+'</td>';
+        return '<td class="thickborder" onmouseout="hide_box('+index.toString()+ ')" onmouseover="free_list('+ index.toString() +' )" height="20px" style="background-color:' + color + '">' + '<span id=' + index.toString() + ' class="hoverbox"></span>'+'</td>';
     } else {
-        return '<th>' + data + '</th>';
+        return '<th class="thickborder">' + data + '</th>';
     }
 }
 var colors = ['#F0F8FF', '#87CEFA', '#1E90FF', '#0000FF'];
@@ -115,7 +115,7 @@ function hide_box(index){
 function gen_html(attendees_info){
     busy_info = attendees_info[1];
     avail = attendees_info[0];
-    var inner_html = '<table class="pure-table pure-table-bordered">';
+    var inner_html = '<table class="pure-table pure-table-bordered thickborder">';
     var hrs = [9,10,11,12,13,14,15,16];
     var mins = [":00", ":15", ":30", ":45"];
     var cells = "";
