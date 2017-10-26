@@ -74,7 +74,7 @@ function wrap_cell(data='', h=0, color='#ff00000', index=0){
     if (!h){
         return '<td class="thickborder" onmouseout="hide_box('+index.toString()+ ')" onmouseover="free_list('+ index.toString() +' )" height="20px" style="background-color:' + color + '">' + '<span id=' + index.toString() + ' class="hoverbox"></span>'+'</td>';
     } else {
-        return '<th class="thickborder">' + data + '</th>';
+        return '<th class="thickborder" colspan="4" align="center">' + data + '</th>';
     }
 }
 var colors = ['#F0F8FF', '#87CEFA', '#1E90FF', '#0000FF'];
@@ -121,9 +121,10 @@ function gen_html(attendees_info){
     var cells = "";
     var x,y;
     for (i in hrs){
-        for (j in mins){
-            cells += wrap_cell(hrs[i] + mins[j], 1);
-        }
+        //for (j in mins){
+        //    if (j == 0){
+        cells += wrap_cell(hrs[i] + ":00", 1);
+        //}
     }
     inner_html += wrap_row(cells);
 

@@ -80,7 +80,7 @@ label {
     display: table-cell;
     border-style: solid;
     border-width: 1px;
-    background-color: lightgray;
+    background-color: white;
 }
 .titleContainer {
     border-bottom: 2px solid #ddd;
