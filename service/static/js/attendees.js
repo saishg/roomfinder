@@ -115,7 +115,7 @@ function hide_box(index){
 function gen_html(attendees_info){
     busy_info = attendees_info[1];
     avail = attendees_info[0];
-    var inner_html = '<table border=1>';
+    var inner_html = '<table class="pure-table pure-table-bordered">';
     var hrs = [9,10,11,12,13,14,15,16];
     var mins = [":00", ":15", ":30", ":45"];
     var cells = "";
